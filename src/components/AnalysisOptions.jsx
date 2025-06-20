@@ -3,8 +3,7 @@ import * as turf from "@turf/turf";
 import "./AnalysisOptions.css";
 
 function AnalysisOptions({ markers, setHeatMap }) {
-
-  //state for Proximity Influence Zones 
+  //state for Proximity Influence Zones
   const [proximityBufferRadius, setProximityBufferRadius] = useState(1000);
   const [proximityResolution, setProximityResolution] = useState(100);
   const [proximityDecay, setProximityDecay] = useState("slow");
@@ -19,17 +18,13 @@ function AnalysisOptions({ markers, setHeatMap }) {
   const [distributionMaxPercentile, setDistributionMaxPercentile] =
     useState(100);
 
-    //state for Cumulative Resource Influence
-     const [cumulativeBufferRadius, setCumulativeBufferRadius] =
-    useState(1000);
+  //state for Cumulative Resource Influence
+  const [cumulativeBufferRadius, setCumulativeBufferRadius] = useState(1000);
   const [cumulativeResolution, setCumulativeResolution] = useState(100);
-  const [cumulativeResourceType, setCumulativeResourceType] =
-    useState("all");
+  const [cumulativeResourceType, setCumulativeResourceType] = useState("all");
   const [cumulativeMinPercentile, setCumulativeMinPercentile] = useState(0);
-  const [cumulativeMaxPercentile, setCumulativeMaxPercentile] =
-    useState(100);
+  const [cumulativeMaxPercentile, setCumulativeMaxPercentile] = useState(100);
   const [cumulativeDecayPower, setCumulativeDecayPower] = useState(1);
-
 
   const normalize = (value, min, max) =>
     max !== min ? (value - min) / (max - min) : 1;
@@ -147,7 +142,6 @@ function AnalysisOptions({ markers, setHeatMap }) {
             proximityInfluence = decayFactor;
           }
 
-
           if (proximityInfluence > 0) {
             totalInfluence += proximityInfluence;
             totalWeight += 1;
@@ -172,7 +166,10 @@ function AnalysisOptions({ markers, setHeatMap }) {
 
   const handleGenerateDistribution = () => {
     // Step 1: Score and normalize markers
-    const scoredMarkers = markers.map((m) => ({ ...m, score: distributionGetScore(m) }));
+    const scoredMarkers = markers.map((m) => ({
+      ...m,
+      score: distributionGetScore(m),
+    }));
     const scores = scoredMarkers.map((m) => m.score);
 
     const min = getPercentile(scores, distributionMinPercentile);
@@ -220,13 +217,17 @@ function AnalysisOptions({ markers, setHeatMap }) {
             { units: "kilometers" }
           );
 
-         
-const distance = dist * 1000;
-if (distance > distributionBufferRadius) continue;
+          const distance = dist * 1000;
+          if (distance > distributionBufferRadius) continue;
 
-const decayFactor = 1 - distance / distributionBufferRadius;
-const decayPower = distributionBufferRadius > 5000 ? 6 : distributionBufferRadius > 2000 ? 3 : 1.5;
-const proximityInfluence = Math.pow(decayFactor, decayPower);
+          const decayFactor = 1 - distance / distributionBufferRadius;
+          const decayPower =
+            distributionBufferRadius > 5000
+              ? 6
+              : distributionBufferRadius > 2000
+              ? 3
+              : 1.5;
+          const proximityInfluence = Math.pow(decayFactor, decayPower);
 
           if (proximityInfluence > 0) {
             totalInfluence += proximityInfluence * m.normalized;
@@ -252,85 +253,87 @@ const proximityInfluence = Math.pow(decayFactor, decayPower);
   };
 
   const handleGenerateCumulative = () => {
-  // Step 1: Score and normalize markers
-  const scoredMarkers = markers.map((m) => ({ ...m, score: cumulativeGetScore(m) }));
-  const scores = scoredMarkers.map((m) => m.score);
+    // Step 1: Score and normalize markers
+    const scoredMarkers = markers.map((m) => ({
+      ...m,
+      score: cumulativeGetScore(m),
+    }));
+    const scores = scoredMarkers.map((m) => m.score);
 
-  const min = getPercentile(scores, cumulativeMinPercentile);
-  const max = getPercentile(scores, cumulativeMaxPercentile);
+    const min = getPercentile(scores, cumulativeMinPercentile);
+    const max = getPercentile(scores, cumulativeMaxPercentile);
 
-  const normalizedMarkers = scoredMarkers.map((m) => ({
-    ...m,
-    normalized: normalize(m.score, min, max),
-  }));
+    const normalizedMarkers = scoredMarkers.map((m) => ({
+      ...m,
+      normalized: normalize(m.score, min, max),
+    }));
 
-  // Step 2: Calculate bounds
-  const allPoints = normalizedMarkers.map((m) =>
-    turf.point([m.longitude, m.latitude])
-  );
-  const bbox = turf.bbox(turf.featureCollection(allPoints));
-  let [minLng, minLat, maxLng, maxLat] = bbox;
+    // Step 2: Calculate bounds
+    const allPoints = normalizedMarkers.map((m) =>
+      turf.point([m.longitude, m.latitude])
+    );
+    const bbox = turf.bbox(turf.featureCollection(allPoints));
+    let [minLng, minLat, maxLng, maxLat] = bbox;
 
-  const expandLng = (maxLng - minLng) * 0.1;
-  const expandLat = (maxLat - minLat) * 0.1;
-  minLng -= expandLng;
-  maxLng += expandLng;
-  minLat -= expandLat;
-  maxLat += expandLat;
+    const expandLng = (maxLng - minLng) * 0.1;
+    const expandLat = (maxLat - minLat) * 0.1;
+    minLng -= expandLng;
+    maxLng += expandLng;
+    minLat -= expandLat;
+    maxLat += expandLat;
 
-  // Step 3: Iterate grid and integrate influence
-  const cols = cumulativeResolution;
-  const rows = cumulativeResolution;
-  const latStep = (maxLat - minLat) / rows;
-  const lngStep = (maxLng - minLng) / cols;
-  const pixels = [];
+    // Step 3: Iterate grid and integrate influence
+    const cols = cumulativeResolution;
+    const rows = cumulativeResolution;
+    const latStep = (maxLat - minLat) / rows;
+    const lngStep = (maxLng - minLng) / cols;
+    const pixels = [];
 
-  let maxPixelValue = 0;
-const decayPower = cumulativeDecayPower;
+    let maxPixelValue = 0;
+    const decayPower = cumulativeDecayPower;
 
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      const lat = maxLat - y * latStep;
-      const lng = minLng + x * lngStep;
-      const pixelPoint = turf.point([lng, lat]);
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const lat = maxLat - y * latStep;
+        const lng = minLng + x * lngStep;
+        const pixelPoint = turf.point([lng, lat]);
 
-      let cumulativeValue = 0;
+        let cumulativeValue = 0;
 
-      for (const m of normalizedMarkers) {
-        const dist = turf.distance(
-          pixelPoint,
-          turf.point([m.longitude, m.latitude]),
-          { units: "kilometers" }
-        );
-        const meters = dist * 1000;
+        for (const m of normalizedMarkers) {
+          const dist = turf.distance(
+            pixelPoint,
+            turf.point([m.longitude, m.latitude]),
+            { units: "kilometers" }
+          );
+          const meters = dist * 1000;
 
-        if (meters <= cumulativeBufferRadius) {
-          const decay = 1 - meters / cumulativeBufferRadius;
-          const adjusted = decay ** cumulativeDecayPower;
-          cumulativeValue += m.normalized * adjusted;
+          if (meters <= cumulativeBufferRadius) {
+            const decay = 1 - meters / cumulativeBufferRadius;
+            const adjusted = decay ** cumulativeDecayPower;
+            cumulativeValue += m.normalized * adjusted;
+          }
         }
+
+        maxPixelValue = Math.max(maxPixelValue, cumulativeValue);
+        pixels.push({
+          x,
+          y,
+          value: cumulativeValue,
+          color: interpolateColor(cumulativeValue / maxPixelValue),
+        });
       }
-
-      maxPixelValue = Math.max(maxPixelValue, cumulativeValue);
-      pixels.push({
-        x,
-        y,
-        value: cumulativeValue,
-        color: interpolateColor(cumulativeValue / maxPixelValue),
-      });
     }
-  }
 
-  // Step 4: Output result
-  setHeatMap({
-    pixels,
-    bounds: [
-      [minLat, minLng],
-      [maxLat, maxLng],
-    ],
-  });
-};
-
+    // Step 4: Output result
+    setHeatMap({
+      pixels,
+      bounds: [
+        [minLat, minLng],
+        [maxLat, maxLng],
+      ],
+    });
+  };
 
   return (
     <div className="options-panel">
@@ -340,22 +343,11 @@ const decayPower = cumulativeDecayPower;
         <h3>Proximity Influence Zones</h3>
         <p className="tooltip">
           A measure of closeness. Having many locations close together is a good
-          indicator of high resource value. A buffer radius is set around the
-          location. Every location is given the same value, regardless of what
-          resources it has. Its value decays with radius. If locations overlap
-          they exert influence on eachother. Influence is based on proximity.
-          Locations close together overlap and form clusters with mutual
-          influence, increasing the value of that area. Incresing buffer size
-          causes more locations to merge into clusters, and more clusters to
-          merge into super clusters. Decay can be increased as buffer radius
-          increases to help scale to large areas without overinflating the value
-          of each individual location when locations are far apart.
+          indicator of high resource value.
         </p>
 
         <div className="inputs">
-          <label>
-            Buffer Radius (m) - Adjust based on Mobility or Desired Scale:
-          </label>
+          <label>Buffer Radius (m):</label>
           <select
             value={proximityBufferRadius}
             onChange={(e) => setProximityBufferRadius(Number(e.target.value))}
@@ -367,10 +359,7 @@ const decayPower = cumulativeDecayPower;
             ))}
           </select>
 
-          <label>
-            Decay Rate - increase when increasing buffer radius for scale and
-            not based on mobility.
-          </label>
+          <label>Decay Rate:</label>
           <select
             value={proximityDecay}
             onChange={(e) => setProximityDecay(e.target.value)}
@@ -379,9 +368,7 @@ const decayPower = cumulativeDecayPower;
             <option value="fast">fast</option>
           </select>
 
-          <label>
-            Resolution- used for heat map pixel grid rows and columns:
-          </label>
+          <label>Resolution:</label>
           <select
             value={proximityResolution}
             onChange={(e) => setProximityResolution(Number(e.target.value))}
@@ -415,28 +402,12 @@ const decayPower = cumulativeDecayPower;
         <p className="tooltip">
           This type of calculation creates a local gradient when locations merge
           into clusters, and highlights the resource distribution within local
-          clusters. Each location is scored based on which resources it has and
-          the quality of those resources. The min and max scores are used to
-          normalize scores and map them to a specific range in order to create a fair
-          comparison. Clamping outliers to different percentile values also
-          helps increase fairness. If one score is really high above the others
-          you can pick a lower percentile value to use as the max. If one score
-          is really low you can pick a higher percentile value to use as the
-          min. A buffer radius is set around each location. Its value decays
-          with radius. Decay is naturally increased as buffer radius increases to help
-          scale to large areas without overinflating the influence of each
-          individual location when locations are far apart. If locations overlap
-          they form clusters and exert influence on eachother. Higher scoring
-          locations generate a positive influence adding to the value of those
-          around it. Lower scoring locations have a negative influence and
-          reduce the score of those around it. If an area is red it means locations in that 
-          area are not contributing as much value as the others around it. 
+          clusters. If an area is orange or red it means locations in that area
+          are not contributing as much value as the others around it.
         </p>
 
         <div className="inputs">
-          <label>
-            Buffer Radius (m) - Adjust for mobility or desired scale:
-          </label>
+          <label>Buffer Radius (m):</label>
 
           <select
             value={distributionBufferRadius}
@@ -451,7 +422,7 @@ const decayPower = cumulativeDecayPower;
             ))}
           </select>
 
-          <label>Resolution- Adjust for precision</label>
+          <label>Resolution:</label>
           <select
             value={distributionResolution}
             onChange={(e) => setDistributionResolution(Number(e.target.value))}
@@ -477,7 +448,7 @@ const decayPower = cumulativeDecayPower;
             <option value="amenities">Amenities</option>
           </select>
 
-          <label>Percentile Range - Adjust for outliers.</label>
+          <label>Percentile Range:</label>
           <div className="percentile-controls">
             <select
               value={distributionMinPercentile}
@@ -528,38 +499,17 @@ const decayPower = cumulativeDecayPower;
         <h3>Cumulative Resource Influence</h3>
 
         <p className="tooltip">
-          This type of
-          calculation highlights the added value of resource sharing within
-          communities and shows the interconnectedness of different services.
-          Each location is scored based on which resources it has and the
-          quality of those resources. The algorithm then compute values for each pixel based on 
-          the score of the location, and the decay rate. Overlapping areas get summed or "integrated over"
-          to generate a cumulative score. As buffer radius increases the cumulative effect can be viewed over
-          larger areas. Patches expand and absorb their neighbours adding their value to their own. 
-          As you increase buffer radius it is helpful to also increase the decay rate, to slow the rate of expansion.
-          Clamping outliers to different percentile values also
-          helps increase fairness. If one score is really high above the others
-          you can pick a lower percentile value to use as the max. If one score
-          is really low you can pick a higher percentile value to use as the
-          min. Decay can be increased as buffer radius increases to help scale
-          to large areas without overinflating the value of each individual
-          location when locations are far apart, or decay can remain the same if buffer radius is
-          varying based on mobility. If locations overlap they form clusters and exert influence
-          on eachother. Influence in this case is always positive. We integrate
-          over each area, and create a cumulative score. Low scoring places do
-          not remove value from those around it, they just add less. 
+          This type of calculation highlights the added value of resource
+          sharing within communities and shows the interconnectedness of
+          different services.
         </p>
 
-       <div className="inputs">
-          <label>
-            Buffer Radius (m) - Adjust for mobility or desired scale:
-          </label>
+        <div className="inputs">
+          <label>Buffer Radius:</label>
 
           <select
             value={cumulativeBufferRadius}
-            onChange={(e) =>
-              setCumulativeBufferRadius(Number(e.target.value))
-            }
+            onChange={(e) => setCumulativeBufferRadius(Number(e.target.value))}
           >
             {[250, 500, 1000, 2000, 3000, 5000, 8000, 10000].map((val) => (
               <option key={val} value={val}>
@@ -569,20 +519,20 @@ const decayPower = cumulativeDecayPower;
           </select>
 
           <label>
-  Decay Power:
-  <select
-    value={cumulativeDecayPower}
-    onChange={(e) => setCumulativeDecayPower(Number(e.target.value))}
-  >
-    {[0.5, 1, 2, 5, 10].map((val) => (
-      <option key={val} value={val}>
-        {val}
-      </option>
-    ))}
-  </select>
-</label>
+            Decay Power:
+            <select
+              value={cumulativeDecayPower}
+              onChange={(e) => setCumulativeDecayPower(Number(e.target.value))}
+            >
+              {[0.5, 1, 2, 5, 10].map((val) => (
+                <option key={val} value={val}>
+                  {val}
+                </option>
+              ))}
+            </select>
+          </label>
 
-          <label>Resolution- Adjust for precision</label>
+          <label>Resolution:</label>
           <select
             value={cumulativeResolution}
             onChange={(e) => setCumulativeResolution(Number(e.target.value))}
@@ -608,7 +558,7 @@ const decayPower = cumulativeDecayPower;
             <option value="amenities">Amenities</option>
           </select>
 
-          <label>Percentile Range - Adjust for outliers.</label>
+          <label>Percentile Range:</label>
           <div className="percentile-controls">
             <select
               value={cumulativeMinPercentile}
@@ -637,8 +587,7 @@ const decayPower = cumulativeDecayPower;
           </div>
         </div>
 
-
- <div className="analysis-buttons">
+        <div className="analysis-buttons">
           <button
             className="generate-button"
             onClick={handleGenerateCumulative}
@@ -654,12 +603,10 @@ const decayPower = cumulativeDecayPower;
             Clear
           </button>
         </div>
-
-
       </div>
 
-      <div className="options-section">
-  <h4>Color Legend:</h4>
+      <div className="legend">
+        <h4>Color Legend:</h4>
         <ul>
           <li>
             <span></span> Green (Strong)
@@ -675,24 +622,7 @@ const decayPower = cumulativeDecayPower;
           </li>
         </ul>
       </div>
-
-<div className="notes"></div>
-<h4>Notes on buffer radius and decay:</h4>
-      <p>  There are two reasons to increase buffer radius. The first is based on mobility. 
-        If a person is more mobile they can walk long distances fast and so buffer radius can be increased. 
-        Also if you are driving or taking a bus you can cover more ground faster. Even seasonal factors can affect mobility.
-        In extreme weather, mobility may be reduced. The buffer radius is user-centric in that case.
-        The second reason for buffer radius is data centric. Sometimes if you want to look at patterns over large scales 
-        with locations that are far apart, you have to increae buffer raidus to form clusters. In that case the decay rate 
-        must increase naturally as buffer radius increases to prevent overinflating the influence of individual 
-        locations when locations or clusters are far apart. When calculating proximity influence zones and 
-        cumulative resource influence, mobility is a factor. However when calculating resource distirbutions,
-        we don't care how far the user travels. we care how much one location's score "bleeds" into nearby locations.
-        In that case it is about geographical distribution of quality, not user interaction. Therfore in that case 
-        decay rate increases naturally as buffer radius increases, and there is no setting for decay rate. 
-      </p>
     </div>
-    
   );
 }
 
