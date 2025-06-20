@@ -609,16 +609,16 @@ function AnalysisOptions({ markers, setHeatMap }) {
         <h4>Color Legend:</h4>
         <ul>
           <li>
-            <span></span> Green (Strong)
+            <span></span> 🟢 = Well-Served / High Resource Zone
           </li>
           <li>
-            <span></span> Yellow (Moderate)
+            <span></span> 🟡 = Moderately Served / Stable but Limited
           </li>
           <li>
-            <span></span> Orange (Weak)
+            <span></span> 🟠 = Under-Served / Needs Attention
           </li>
           <li>
-            <span></span> Red (Critical)
+            <span></span> 🔴 = Critical Shortage / Resource Desert
           </li>
         </ul>
       </div>
