@@ -1,0 +1,410 @@
+/*──────────────────────────────────────────────*/
+/* Used for General Styling  and Layout         */
+/*──────────────────────────────────────────────*/
+
+
+/*Used in: AddLocationModal.jsx, ExportPreviewModal.jsx, EditScoreModal.jsx*/
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 52vw;             
+  max-width: 90vw; 
+  padding: 2vh 2vw;
+  background-color: rgba(0,0,0,0.5);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  direction: rtl;
+  backdrop-filter: blur(70px);
+}
+
+/*Used in: AddLocationModal.jsx, ExportPreviewModal.jsx, EditScoreModal.jsx*/
+.modal-overlay * {
+  direction: ltr;
+}
+
+/*Used in: AddLocationModal.jsx, EditScoreModal.jsx*/
+.centered-modal-overlay {
+  margin: auto;
+}
+
+/*Used in: ExportPreviewModal.jsx*/
+.offcenter-modal-overlay {
+  margin-left: 10%;
+}
+
+/*Used in: AddLocationModal.jsx, ExportPreviewModal.jsx, EditScoreModal.jsx*/
+ .modal {
+  width: 50vw;
+  max-width: 100%;
+  font-family: sans-serif;
+  background-color: rgba(54, 164, 109, 0.4);
+  margin: 2vh 2vw;
+  padding: 2vh 2vw;
+  border: 2px solid rgb(25, 80, 59);
+  backdrop-filter: blur(10px);
+  color: white;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 1);
+  box-sizing: border-box;
+  border-radius: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/*Used for: Mobile Styling*/
+@media (max-width: 600px) {
+  /* Used in: ExportPreviewModal */
+  .modal-overlay.offcenter-modal-overlay {
+    margin: auto;      
+    width: 95vw;
+  }
+
+  /* Used in: AddLocationModal, EditScoreModal, etc. */
+  .modal-overlay.centered-modal-overlay {
+    width: 95vw;
+  }
+
+  /*Used in: AddLocationModal.jsx, ExportPreviewModal.jsx, EditScoreModal.jsx*/
+  .modal {
+    width: 92vw;
+  }
+
+}
+
+
+  /*Used in: AddLocationModal.jsx, ExportPreviewModal.jsx, EditScoreModal.jsx*/
+.modal .close-button {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background:none;
+  border: none;
+  font-size: 1.5rem;
+  color: #ff4d4d;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+}
+
+/*Used in: AddLocationModal.jsx, ExportPreviewModal.jsx, EditScoreModal.jsx*/
+.modal label {
+  display: block;
+  margin-bottom: 6px;
+  color: white;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+
+
+/* Used in: AddLocationModal.jsx, ExportPreviewModal.jsx, EditScoreModal.jsx */
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* Used in: AddLocationModal.jsx, ExportPreviewModal.jsx, EditScoreModal.jsx */
+.buttons-container button {
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  background-color: #36a46d;
+  color: white;
+  border: 1px solid #1b5c3f;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Used in: AddLocationModal.jsx, ExportPreviewModal.jsx, EditScoreModal.jsx */
+.buttons-container button:hover {
+  background-color: #2b8258;
+}
+
+/*───────────────────────────────────────────────────────────*/
+/* Used in: AddLocationModal.jsx  and EditScoreModal.jsx     */
+/*───────────────────────────────────────────────────────────*/
+
+/*Used in: AddLocationModal.jsx,*/
+.modal input {
+  width: 100%;
+  padding: 3px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  background-color: rgba(93, 129, 117, 1);
+  color: white;
+  font-size: 0.7rem;
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.modal select {
+  width: 100%;
+  padding: 3px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  background-color: rgba(93, 129, 117, 1);
+  color: white;
+  font-size: 0.7rem;
+   max-height: 200px;
+  overflow-y: auto;
+}
+
+ 
+/*Used in: AddLocationModal.jsx,*/
+.modal input::placeholder {
+  color: rgba(255, 255, 255, 0.5);             
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.modal table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0px;
+  color: white;
+  font-size: 0.7rem;
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.modal th:nth-child(1) {
+  padding: 6px 6px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.7rem;
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.modal th:not(:nth-child(1)) {
+  padding: 6px 6px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.7rem;
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.modal td:nth-child(1){
+  padding: 3px 6px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+/*Used in: AddLocationModal.jsx,*/
+.modal td:not(:nth-child(1)){
+  padding: 3px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+   text-align: center;
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.closed-cell {
+  text-align: center;
+  font-style: italic;
+  padding: 6px 0;
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.modal .inline-checkbox-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.modal .label-container {
+  display:flex;
+  min-width: 200px;
+  font-size: 0.9rem;
+  color: white;
+  align-items: center;
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.modal .checkbox-container {
+  display: flex;
+  align-items: center;
+   transform: translateY(1px);
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.modal input[type="checkbox"] {
+  transform: translateY(2px); 
+}
+
+/*Used in: AddLocationModal.jsx,*/
+.modal .notes-cell {
+  flex-grow: 1;
+  font-size: 0.8rem;
+  color: #ccc;
+  font-style: italic;
+}
+
+/*──────────────────────────────────────────────*/
+/* Used in: AddLocationModal.jsx (Mobile only)  */
+/*──────────────────────────────────────────────*/
+@media (max-width: 600px) {
+  .modal .inline-checkbox-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    border-style: solid;
+    border-left: 0;
+    border-right: 0;
+    border-top: 1px solid darkgrey;
+    border-bottom: 1px solid darkgrey;
+  }
+
+  .modal .label-container {
+    min-width: unset;
+    font-size: 1rem;
+  }
+
+  .modal .checkbox-container {
+    margin-top: 0px;
+  }
+
+  .modal .notes-cell {
+    font-size: 0.75rem;
+    color: #ccc;
+    font-style: italic;
+    margin-top: 0px;
+    margin-bottom: 5px;
+  }
+}
+
+/*──────────────────────────────────────────────*/
+/* Used in: ExportPreviewModal.jsx              */
+/*──────────────────────────────────────────────*/
+.export-preview-box {
+  background: white;
+  color: black;
+  padding: 40px;
+  margin-top: 12px;
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  overflow: auto;
+  min-height: 100vh;
+}
+
+.export-preview-box .map-placeholder {
+  height: 200px;
+  background: #ddd;
+  border: 1px dashed #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.export-preview-box h3 {
+  margin-top: 20px;
+  padding: 20px;
+  font-size: 2rem;
+  text-align: center;
+  background: rgb(69, 159, 141);
+  border-width: 4px;
+  border-color: black;
+  border-style: solid;
+  border-radius: 20px;
+}
+
+.notes-container {
+  font-size: 16px;
+  border-width: 2px;
+  border-color: #000000;
+  border-style: solid;
+  border-radius: 20px;
+  background-color: #ffffff;
+  color: #000000;
+  padding-left: 20px;
+  padding-right: 20px;
+  min-height: 56px;
+}
+
+.export-section-all {
+  font-size: 16px;
+  margin-left: 0px;
+  background: rgb(69, 159, 141);
+  color: #000000;
+  padding: 0px;
+}
+
+.export-section-filters {
+  margin-top: 16px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 16px;
+  background: rgb(69, 159, 141);
+  border-radius: 20px;
+  font-size: 16px;
+  border-width: 4px;
+  border-color: #000000;
+  border-style: solid;
+}
+
+.filter-list {
+  font-size: 16px;
+  margin-left: 0px;
+  background: rgb(69, 159, 141);
+  color: #000000;
+  padding: 0px;
+}
+
+.export-section-selected {
+  font-size: 16px;
+  margin-left: 0px;
+  background: rgb(69, 159, 141);
+  color: #000000;
+  padding: 0px;
+}
+
+.export-section {
+  margin-top: 16px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 26px;
+  background: rgb(69, 159, 141);
+  border-radius: 20px;
+  font-size: 16px;
+  border-width: 4px;
+  border-color: #000000;
+  border-style: solid;
+}
+
+.export-section h4 {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #000000;
+}
+
+.export-section ul {
+  padding-left: 20px;
+  margin: 0;
+  color: #000000;
+}
+
+/*─────────────────────────────────*/
+/* Used in: EditScoreModal.jsx     */
+/*─────────────────────────────────*/
+
+.modal h2 {
+  font-size: 1.6rem;
+}
+
+.modal h3 {
+  font-size: 1.2rem;
+}
+
+.empty-message {
+  font-style: italic;
+  color: #888;
+  margin-top: 1em;
+}

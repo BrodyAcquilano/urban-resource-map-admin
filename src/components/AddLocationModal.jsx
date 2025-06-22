@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./AddLocationModal.css";
+import "../styles/modals.css";
 import axios from "axios";
 
 import {
@@ -55,8 +55,8 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
   if (!isOpen) return null;
 
   return (
-    <div className="add-modal-overlay">
-      <div className="add-location-modal">
+    <div className="modal-overlay centered-modal-overlay">
+      <div className="modal">
         <button className="close-button" onClick={onClose}>
           ×
         </button>
@@ -258,33 +258,33 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
           <>
             <h3>Resources</h3>
             <div className="resources-list">
-              {resources.map((res) => (
-                <div key={res} className="inline-checkbox-row">
-                  <label className="label-container">{res}</label>
+              {resources.map((label) => (
+                <div key={label} className="inline-checkbox-row">
+                  <label className="label-container">{label}</label>
                   <div className="checkbox-container">
                     <input
                       type="checkbox"
-                      checked={formData.resources[res]}
+                      checked={formData.resources[label]}
                       onChange={(e) => {
                         const checked = e.target.checked;
                         setFormData((prev) => ({
                           ...prev,
                           resources: {
                             ...prev.resources,
-                            [res]: checked,
+                            [label]: checked,
                           },
                           scores: {
                             ...prev.scores,
                             resources: {
                               ...prev.scores.resources,
-                              [res]: checked ? 3 : 0,
+                              [label]: checked ? 3 : 0,
                             },
                           },
                         }));
                       }}
                     />
                   </div>
-                  <div className="notes-cell">{resourceNotes[res] || ""}</div>
+                  <div className="notes-cell">{resourceNotes[label] || ""}</div>
                 </div>
               ))}
             </div>
@@ -307,13 +307,13 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
                           ...prev,
                           services: {
                             ...prev.services,
-                            [srv]: checked,
+                            [label]: checked,
                           },
                           scores: {
                             ...prev.scores,
                             services: {
                               ...prev.scores.services,
-                              [srv]: checked ? 3 : 0,
+                              [label]: checked ? 3 : 0,
                             },
                           },
                         }));
@@ -344,13 +344,13 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
                           ...prev,
                           amenities: {
                             ...prev.amenities,
-                            [amn]: checked,
+                            [label]: checked,
                           },
                           scores: {
                             ...prev.scores,
                             amenities: {
                               ...prev.scores.amenities,
-                              [amn]: checked ? 3 : 0,
+                              [label]: checked ? 3 : 0,
                             },
                           },
                         }));
@@ -364,7 +364,7 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
           </>
         )}
 
-        <div className="navigation-buttons">
+        <div className="buttons-container">
           {page > 1 && <button onClick={() => setPage(page - 1)}>Back</button>}
           {page < 4 ? (
             <button onClick={() => setPage(page + 1)}>Next</button>

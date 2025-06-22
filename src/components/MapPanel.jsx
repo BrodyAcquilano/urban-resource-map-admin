@@ -11,7 +11,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import HeatMapLayer from "./HeatMapLayer";
-import "./MapPanel.css";
+import "../styles/MapPanel.css";
 
 function MapSync({ setMapCenter, setMapZoom, clearPatches }) {
   useMapEvents({
