@@ -1,0 +1,242 @@
+
+/* Used in: FilterPanel.jsx, InfoPanel.jsx, EditLocation.jsx, ExportOptions.jsx, AnalysisOptions.jsx */
+.panel {
+  font-family: sans-serif;
+  background-color: rgba(54, 164, 109, 0.2);
+  padding: 15px;
+  overflow:hidden;
+  width: 100%;
+  border: 2px solid rgb(25, 80, 59);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  color: rgb(59, 71, 63);
+  box-shadow: 0 0 8px rgba(0,0,0,1);
+  min-height: 100%;
+  box-sizing: border-box;
+  border-radius: 20px;
+}
+
+
+
+/* Used in: FilterPanel.jsx, InfoPanel.jsx, EditLocation.jsx, ExportOptions.jsx, AnalysisOptions.jsx */
+/*A section contains multiple form-groups, or multiple inline-checkbox-rows, a table, or a list*/
+/*Basically any section within a panel. It separates section with margin,padding and border*/
+.section {
+  padding-bottom: 0.75rem;
+  border: none;
+  margin: 1.5rem 0;
+  border-bottom: 1px groove #6b6a6a;
+  box-shadow: 0 1px 0 #fff;
+}
+
+
+
+
+/* Used in: FilterPanel.jsx, EditLocation.jsx, ExportOptions.jsx*/
+/*A form-group contains two elements: a label and an input like a <select> or <input>*/
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 6px;
+}
+
+.form-group label {
+    display: block;
+  font-size: 0.9rem;
+  color: rgb(59, 71, 63);
+  font-weight: 500;
+   margin-bottom: 6px;
+}
+
+
+
+/* Used in: FilterPanel.jsx, EditLocation.jsx, ExportOptions.jsx*/
+/*A inline-checkbox-row contains two elements: a label-container and a checkbox-container*/
+.panel .inline-checkbox-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+}
+
+.panel .label-container{
+  display:flex;
+  min-width: 200px;
+  font-size: 0.9rem;
+  color: rgb(59, 71, 63);
+  align-items: center;
+  font-weight: 500;
+   margin-bottom: 6px;
+}
+
+
+.panel .checkbox-container {
+  display: flex;
+  align-items: center;
+   transform: translateY(1px);
+}
+
+/* Used in: FilterPanel.jsx, InfoPanel.jsx, EditLocation.jsx*/
+.panel h2 {
+  font-size: 1.4rem;
+  color: rgb(0, 14, 6);
+}
+
+/* Used in: FilterPanel.jsx, InfoPanel.jsx, EditLocation.jsx*/
+.panel h3 {
+  color: rgb(0, 11, 4);
+}
+
+.panel h4 {
+  color: rgb(0, 11, 4);
+}
+
+/* Used in: InfoPanel.jsx, AnalysisOptions.jsx*/
+.panel ul {
+  padding-left: 20px;
+}
+
+/* Used in: InfoPanel.jsx, AnalysisOptions.jsx*/
+.panel li {
+  margin-bottom: 0.3em;
+}
+
+
+/* Used in: EditLocation.jsx*/
+.panel input {
+  width: 100%;
+  padding: 3px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  background-color: rgba(93, 129, 117, 1);
+  color: white;
+  font-size: 0.7rem;
+}
+
+/* Used in: EditLocation.jsx*/
+.panel input::placeholder {
+  color: rgba(255, 255, 255, 0.5);             
+}
+
+/* Used in: FilterPanel.jsx, EditLocation.jsx*/
+.panel select {
+  width: 100%;
+  padding: 3px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  background-color: rgba(93, 129, 117, 1);
+  color: white;
+  font-size: 0.7rem;
+   max-height: 200px;
+  overflow-y: auto;
+}
+
+
+
+/* Used in: EditLocation.jsx*/
+.panel table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0px;
+  color: rgb(59, 71, 63);
+  font-size: 0.7rem;
+}
+
+/* Used in: EditLocation.jsx*/
+.panel th:nth-child(1) {
+  padding: 6px 6px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.7rem;
+}
+
+
+/* Used in: EditLocation.jsx*/
+.panel th:not(:nth-child(1)) {
+  padding: 6px 6px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.7rem;
+}
+
+/* Used in: EditLocation.jsx*/
+.panel td:nth-child(1){
+  padding: 3px 6px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Used in: EditLocation.jsx*/
+.panel td:not(:nth-child(1)){
+  padding: 3px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+   text-align: center;
+}
+
+/* Used in: EditLocation.jsx*/
+.closed-cell {
+  text-align: center;
+  font-style: italic;
+  padding: 6px 0;
+}
+
+
+
+/* Used in: FilterPanel.jsx, EditLocation.jsx*/
+.panel input[type="checkbox"] {
+  transform: translateY(2px); 
+}
+
+
+/* Used in: EditLocation.jsx*/
+.panel .notes-cell {
+  flex-grow: 1;
+  font-size: 0.8rem;
+  color:rgb(59, 71, 63);
+  font-style: italic;
+}
+
+/* Used in: EditLocation.jsx*/
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  gap:10px;
+}
+
+/* Used in: EditLocation.jsx*/
+.buttons-container button {
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  background-color: #36a46d;
+  color: white;
+  border: 1px solid #1b5c3f;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Used in: EditLocation.jsx*/
+.buttons-container button:hover {
+  background-color: #2b8258;
+}
+
+/*Used in: ExportOptions.jsx*/
+.panel textarea {
+  width: 100%;
+  padding: 3px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  background-color: rgba(93, 129, 117, 1);
+  color: white;
+  font-size: 0.7rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.panel textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);             
+}

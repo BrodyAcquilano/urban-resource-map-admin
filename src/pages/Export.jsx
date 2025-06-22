@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import ExportOptions from "../components/ExportOptions.jsx";
 import ExportPreviewModal from "../components/ExportPreviewModal.jsx";
-import "./Export.css";
+import '../styles/pages.css';
 import { captureOffscreenMap } from "../utils/captureOffscreenMap.js";
 
 function Export({ filteredMarkers, selectedLocation, selectedFilters }) {
@@ -20,7 +20,7 @@ function Export({ filteredMarkers, selectedLocation, selectedFilters }) {
     <>
       {/* Editor Panel Toggle + Panel */}
       <button
-        className={`export-side-toggle export-toggle ${
+        className={`side-toggle toggle ${
           showExportOptions ? "" : "collapsed-toggle"
         }`}
         onClick={() => setShowExportOptions(!showExportOptions)}
@@ -28,7 +28,7 @@ function Export({ filteredMarkers, selectedLocation, selectedFilters }) {
         ☰
       </button>
       <div
-        className={`export-overlay-panel export-panel-wrapper ${
+        className={`overlay-panel panel-wrapper ${
           showExportOptions ? "" : "collapsed"
         }`}
       >
@@ -45,7 +45,7 @@ function Export({ filteredMarkers, selectedLocation, selectedFilters }) {
 
       {/* Centered Export Button */}
       <button
-        className="export-preview-button"
+        className="modal-button"
         onClick={async () => {
           const snapshot = await captureOffscreenMap();
           setMapImage(snapshot);

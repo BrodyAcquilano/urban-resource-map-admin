@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import InfoPanel from "../components/InfoPanel.jsx";
-import './Home.css';
+import '../styles/pages.css';
 
 function Home({ selectedLocation }) {
   const [showInfo, setShowInfo] = useState(false);
@@ -9,7 +9,7 @@ function Home({ selectedLocation }) {
     <>
      {/* Info Panel Toggle + Panel */}
       <button
-        className={`info-side-toggle info-toggle ${
+        className={`side-toggle toggle ${
           showInfo ? "" : "collapsed-toggle"
         }`}
         onClick={() => setShowInfo(!showInfo)}
@@ -17,7 +17,7 @@ function Home({ selectedLocation }) {
         ☰
       </button>
       <div
-        className={`info-overlay-panel info-panel-wrapper ${
+        className={`overlay-panel panel-wrapper ${
           showInfo ? "" : "collapsed"
         }`}
       >

@@ -345,30 +345,6 @@ export function validateOpenCloseTimes(openHours, isLocationOpen) {
   return true;
 }
 
-// ────────────────
-// Rendering Helpers
-// ────────────────
-
-// Used in: InfoPanel.jsx for displaying only checked items.
-//Edit this if you want the information displayed differently.
-//Like sorting labels alphabetically
-export const renderCheckedItems = (data, labelList, title) => {
-  const checked = labelList.filter((label) => data?.[label]);
-  return (
-    <>
-      <h3>{title}</h3>
-      {checked.length ? (
-        <ul>
-          {checked.map((label) => (
-            <li key={label}>{label}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>No {title.toLowerCase()} listed</p>
-      )}
-    </>
-  );
-};
 
 /* 
 ────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 // src/components/EditLocation.jsx
 
 import React, { useState, useEffect } from "react";
-import "./EditLocation.css";
+import "../styles/panels.css";
 import axios from "axios";
 import {
   daysOfWeek,
@@ -12,6 +12,7 @@ import {
   validateRequiredFields,
   getSafeLocationData,
 } from "../data/dataModel.jsx";
+import { renderCheckboxGroup } from "../utils/renderingHelpers.jsx";
 
 function EditLocation({ setMarkers, selectedLocation, setSelectedLocation }) {
   const [formData, setFormData] = useState(getSafeLocationData());
@@ -69,274 +70,276 @@ function EditLocation({ setMarkers, selectedLocation, setSelectedLocation }) {
     }
   };
 
+  const handleResourceChange = (label, checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      resources: {
+        ...prev.resources,
+        [label]: checked,
+      },
+      scores: {
+        ...prev.scores,
+        resources: {
+          ...prev.scores.resources,
+          [label]: checked ? 3 : 0,
+        },
+      },
+    }));
+  };
+
+  const handleServiceChange = (label, checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      services: {
+        ...prev.services,
+        [label]: checked,
+      },
+      scores: {
+        ...prev.scores,
+        services: {
+          ...prev.scores.services,
+          [label]: checked ? 3 : 0,
+        },
+      },
+    }));
+  };
+
+  const handleAmenityChange = (label, checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      amenities: {
+        ...prev.amenities,
+        [label]: checked,
+      },
+      scores: {
+        ...prev.scores,
+        amenities: {
+          ...prev.scores.amenities,
+          [label]: checked ? 3 : 0,
+        },
+      },
+    }));
+  };
+
   if (!selectedLocation) {
     return (
-      <div className="edit-location-panel">
-        <h2>Edit Location</h2>
+      <div className="panel">
+        <div className="section">
+          <h2>Edit Location</h2>
+        </div>
         <p>Select a marker to view details.</p>
       </div>
     );
   }
 
   return (
-    <div className="edit-location-panel">
-      <h1>Edit Location</h1>
+    <div className="panel">
+      <div className="section">
+        <h2>Edit Location</h2>
+      </div>
 
-      <label>Name:</label>
-      <input
-        value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        placeholder="Required..."
-        required
-      />
-
-      <label>Latitude:</label>
-      <input
-        value={formData.latitude}
-        onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-        placeholder="Required..."
-        required
-      />
-
-      <label>Longitude:</label>
-      <input
-        value={formData.longitude}
-        onChange={(e) =>
-          setFormData({ ...formData, longitude: e.target.value })
-        }
-        placeholder="Required..."
-        required
-      />
-
-      <label>Address:</label>
-      <input
-        value={formData.address}
-        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-        placeholder="Optional..."
-      />
-
-      <label>Website:</label>
-      <input
-        value={formData.website}
-        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-        placeholder="Optional..."
-      />
-
-      <label>Phone:</label>
-      <input
-        value={formData.phone}
-        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-        placeholder="Optional..."
-      />
-
-      <div className="inline-checkbox-row">
-        <label className="label-container">♿ Wheelchair Accessible</label>
-        <div className="checkbox-container">
+      <div className="section">
+        <div className="form-group">
+          <label>Name:</label>
           <input
-            type="checkbox"
-            checked={formData.wheelchairAccessible}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                wheelchairAccessible: e.target.checked,
-              })
-            }
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="Required..."
+            required
           />
+        </div>
+
+        <div className="form-group">
+          <label>Latitude:</label>
+          <input
+            value={formData.latitude}
+            onChange={(e) =>
+              setFormData({ ...formData, latitude: e.target.value })
+            }
+            placeholder="Required..."
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Longitude:</label>
+          <input
+            value={formData.longitude}
+            onChange={(e) =>
+              setFormData({ ...formData, longitude: e.target.value })
+            }
+            placeholder="Required..."
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Address:</label>
+          <input
+            value={formData.address}
+            onChange={(e) =>
+              setFormData({ ...formData, address: e.target.value })
+            }
+            placeholder="Optional..."
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Website:</label>
+          <input
+            value={formData.website}
+            onChange={(e) =>
+              setFormData({ ...formData, website: e.target.value })
+            }
+            placeholder="Optional..."
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Phone:</label>
+          <input
+            value={formData.phone}
+            onChange={(e) =>
+              setFormData({ ...formData, phone: e.target.value })
+            }
+            placeholder="Optional..."
+          />
+        </div>
+
+        <div className="inline-checkbox-row">
+          <label className="label-container">♿ Wheelchair Accessible</label>
+          <div className="checkbox-container">
+            <input
+              type="checkbox"
+              checked={formData.wheelchairAccessible}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  wheelchairAccessible: e.target.checked,
+                })
+              }
+            />
+          </div>
         </div>
       </div>
 
-      <h3>Open Hours</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Open?</th>
-            <th>Open</th>
-            <th>Close</th>
-          </tr>
-        </thead>
-        <tbody>
-          {daysOfWeek.map((day) => (
-            <tr key={day}>
-              <td>{day}</td>
-              <td>
-                <input
-                  type="checkbox"
-                  checked={formData.isLocationOpen[day]}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    setFormData((prev) => ({
-                      ...prev,
-                      isLocationOpen: {
-                        ...prev.isLocationOpen,
-                        [day]: checked,
-                      },
-                      openHours: {
-                        ...prev.openHours,
-                        [day]: checked
-                          ? { open: "9:00 a.m.", close: "5:00 p.m." }
-                          : { open: "", close: "" },
-                      },
-                    }));
-                  }}
-                />
-              </td>
-              {formData.isLocationOpen[day] ? (
-                <>
-                  <td>
-                    <select
-                      value={formData.openHours[day]?.open || ""}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          openHours: {
-                            ...prev.openHours,
-                            [day]: {
-                              ...prev.openHours[day],
-                              open: e.target.value,
-                            },
-                          },
-                        }))
-                      }
-                    >
-                      {timeOptionsAMPM.map((time) => (
-                        <option key={time} value={time}>
-                          {time}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td>
-                    <select
-                      value={formData.openHours[day]?.close || ""}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          openHours: {
-                            ...prev.openHours,
-                            [day]: {
-                              ...prev.openHours[day],
-                              close: e.target.value,
-                            },
-                          },
-                        }))
-                      }
-                    >
-                      {timeOptionsAMPM.map((time) => (
-                        <option key={time} value={time}>
-                          {time}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                </>
-              ) : (
-                <td colSpan={2}>
-                  <div className="closed-cell">Closed</div>
-                </td>
-              )}
+      <div className="section">
+        <h3>Open Hours</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Open?</th>
+              <th>Open</th>
+              <th>Close</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <h3>Resources</h3>
-      <div className="resources-list">
-        {resources.map((key) => (
-          <div key={key} className="inline-checkbox-row">
-            <label className="label-container">{key}</label>
-            <div className="checkbox-container">
-              <input
-                type="checkbox"
-                checked={formData.resources[key]}
-                onChange={(e) => {
-                  const checked = e.target.checked;
-                  setFormData((prev) => ({
-                    ...prev,
-                    resources: {
-                      ...prev.resources,
-                      [key]: checked,
-                    },
-                    scores: {
-                      ...prev.scores,
-                      resources: {
-                        ...prev.scores.resources,
-                        [key]: checked ? 3 : 0,
-                      },
-                    },
-                  }));
-                }}
-              />
-            </div>
-          </div>
-        ))}
+          </thead>
+          <tbody>
+            {daysOfWeek.map((day) => (
+              <tr key={day}>
+                <td>{day}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={formData.isLocationOpen[day]}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setFormData((prev) => ({
+                        ...prev,
+                        isLocationOpen: {
+                          ...prev.isLocationOpen,
+                          [day]: checked,
+                        },
+                        openHours: {
+                          ...prev.openHours,
+                          [day]: checked
+                            ? { open: "9:00 a.m.", close: "5:00 p.m." }
+                            : { open: "", close: "" },
+                        },
+                      }));
+                    }}
+                  />
+                </td>
+                {formData.isLocationOpen[day] ? (
+                  <>
+                    <td>
+                      <select
+                        value={formData.openHours[day]?.open || ""}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            openHours: {
+                              ...prev.openHours,
+                              [day]: {
+                                ...prev.openHours[day],
+                                open: e.target.value,
+                              },
+                            },
+                          }))
+                        }
+                      >
+                        {timeOptionsAMPM.map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td>
+                      <select
+                        value={formData.openHours[day]?.close || ""}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            openHours: {
+                              ...prev.openHours,
+                              [day]: {
+                                ...prev.openHours[day],
+                                close: e.target.value,
+                              },
+                            },
+                          }))
+                        }
+                      >
+                        {timeOptionsAMPM.map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </>
+                ) : (
+                  <td colSpan={2}>
+                    <div className="closed-cell">Closed</div>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      <h3>Services</h3>
-      <div className="services-section">
-        {services.map((key) => (
-          <div key={key} className="inline-checkbox-row">
-            <label className="label-container">{key}</label>
-            <div className="checkbox-container">
-              <input
-                type="checkbox"
-                checked={formData.services[key]}
-                onChange={(e) => {
-                  const checked = e.target.checked;
-                  setFormData((prev) => ({
-                    ...prev,
-                    services: {
-                      ...prev.services,
-                      [key]: checked,
-                    },
-                    scores: {
-                      ...prev.scores,
-                      services: {
-                        ...prev.scores.services,
-                        [key]: checked ? 3 : 0,
-                      },
-                    },
-                  }));
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
+      {renderCheckboxGroup(
+        "Resources",
+        resources,
+        formData.resources,
+        handleResourceChange
+      )}
+      {renderCheckboxGroup(
+        "Services",
+        services,
+        formData.services,
+        handleServiceChange
+      )}
+      {renderCheckboxGroup(
+        "Amenities",
+        amenities,
+        formData.amenities,
+        handleAmenityChange
+      )}
 
-      <h3>Amenities</h3>
-      <div className="amenities-section">
-        {amenities.map((key) => (
-          <div key={key} className="inline-checkbox-row">
-            <label className="label-container">{key}</label>
-            <div className="checkbox-container">
-              <input
-                type="checkbox"
-                checked={formData.amenities[key]}
-                onChange={(e) => {
-                  const checked = e.target.checked;
-                  setFormData((prev) => ({
-                    ...prev,
-                    amenities: {
-                      ...prev.amenities,
-                      [key]: checked,
-                    },
-                    scores: {
-                      ...prev.scores,
-                      amenities: {
-                        ...prev.scores.amenities,
-                        [key]: checked ? 3 : 0,
-                      },
-                    },
-                  }));
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="edit-buttons">
+      <div className="buttons-container">
         <button onClick={handleEditSubmit}>Save Changes</button>
         <button onClick={handleDelete} className="delete-btn">
           Delete Location

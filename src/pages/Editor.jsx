@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import EditLocation from "../components/EditLocation.jsx";
 import AddLocationModal from "../components/AddLocationModal.jsx";
-import "./Editor.css";
+import '../styles/pages.css';
 
 function Editor({ setMarkers, selectedLocation, setSelectedLocation }) {
   const [isAddModalOpen, setAddModalOpen] = useState(false);
@@ -13,7 +13,7 @@ function Editor({ setMarkers, selectedLocation, setSelectedLocation }) {
     <>
       {/* Editor Panel Toggle + Panel */}
       <button
-        className={`editor-side-toggle editor-toggle ${
+        className={`side-toggle toggle ${
           showEditLocation ? "" : "collapsed-toggle"
         }`}
         onClick={() => setShowEditLocation(!showEditLocation)}
@@ -21,7 +21,7 @@ function Editor({ setMarkers, selectedLocation, setSelectedLocation }) {
         ☰
       </button>
       <div
-        className={`editor-overlay-panel editor-panel-wrapper ${
+        className={`overlay-panel panel-wrapper ${
           showEditLocation ? "" : "collapsed"
         }`}
       >
@@ -34,7 +34,7 @@ function Editor({ setMarkers, selectedLocation, setSelectedLocation }) {
 
       {/* Centered Add Button */}
       <button
-        className="add-location-button"
+        className="modal-button"
         onClick={() => setAddModalOpen(true)}
       >
         ➕

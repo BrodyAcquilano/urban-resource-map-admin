@@ -1,7 +1,4 @@
-body {
-  margin: 0;
-  padding: 0;
-}
+/* Used in: App.jsx */
 
 .app-container {
   display: flex;

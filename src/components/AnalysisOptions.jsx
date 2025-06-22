@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import * as turf from "@turf/turf";
-import "./AnalysisOptions.css";
+import "../styles/panels.css";
 
 function AnalysisOptions({ markers, setHeatMap }) {
   //state for Proximity Influence Zones
@@ -336,17 +336,19 @@ function AnalysisOptions({ markers, setHeatMap }) {
   };
 
   return (
-    <div className="options-panel">
-      <h2>Analysis Options</h2>
+    <div className="panel">
+      <div className="section">
+        <h2>Analysis Options</h2>
+      </div>
 
-      <div className="options-section">
+      <div className="section">
         <h3>Proximity Influence Zones</h3>
         <p className="tooltip">
           A measure of closeness. Having many locations close together is a good
           indicator of high resource value.
         </p>
 
-        <div className="inputs">
+        <div className="form-group">
           <label>Buffer Radius (m):</label>
           <select
             value={proximityBufferRadius}
@@ -358,7 +360,9 @@ function AnalysisOptions({ markers, setHeatMap }) {
               </option>
             ))}
           </select>
+        </div>
 
+        <div className="form-group">
           <label>Decay Rate:</label>
           <select
             value={proximityDecay}
@@ -367,7 +371,9 @@ function AnalysisOptions({ markers, setHeatMap }) {
             <option value="slow">slow</option>
             <option value="fast">fast</option>
           </select>
+        </div>
 
+        <div className="form-group">
           <label>Resolution:</label>
           <select
             value={proximityResolution}
@@ -381,12 +387,9 @@ function AnalysisOptions({ markers, setHeatMap }) {
           </select>
         </div>
 
-        <div className="analysis-buttons">
-          <button className="generate-button" onClick={handleGenerateProximity}>
-            Generate
-          </button>
+        <div className="buttons-container">
+          <button onClick={handleGenerateProximity}>Generate</button>
           <button
-            className="clear-button"
             onClick={() => {
               setHeatMap(null);
             }}
@@ -396,7 +399,7 @@ function AnalysisOptions({ markers, setHeatMap }) {
         </div>
       </div>
 
-      <div className="options-section">
+      <div className="section">
         <h3>Resource Distribution Mapping</h3>
 
         <p className="tooltip">
@@ -406,7 +409,7 @@ function AnalysisOptions({ markers, setHeatMap }) {
           are not contributing as much value as the others around it.
         </p>
 
-        <div className="inputs">
+        <div className="form-group">
           <label>Buffer Radius (m):</label>
 
           <select
@@ -421,7 +424,9 @@ function AnalysisOptions({ markers, setHeatMap }) {
               </option>
             ))}
           </select>
+        </div>
 
+        <div className="form-group">
           <label>Resolution:</label>
           <select
             value={distributionResolution}
@@ -433,7 +438,9 @@ function AnalysisOptions({ markers, setHeatMap }) {
               </option>
             ))}
           </select>
+        </div>
 
+        <div className="form-group">
           <label>Resource Type:</label>
           <select
             value={distributionResourceType}
@@ -447,45 +454,39 @@ function AnalysisOptions({ markers, setHeatMap }) {
             <option value="services">Services</option>
             <option value="amenities">Amenities</option>
           </select>
-
-          <label>Percentile Range:</label>
-          <div className="percentile-controls">
-            <select
-              value={distributionMinPercentile}
-              onChange={(e) =>
-                setDistributionMinPercentile(Number(e.target.value))
-              }
-            >
-              {[0, 5, 10, 15, 20].map((val) => (
-                <option key={val} value={val}>
-                  Min: {val}%
-                </option>
-              ))}
-            </select>
-            <select
-              value={distributionMaxPercentile}
-              onChange={(e) =>
-                setDistributionMaxPercentile(Number(e.target.value))
-              }
-            >
-              {[80, 85, 90, 95, 100].map((val) => (
-                <option key={val} value={val}>
-                  Max: {val}%
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
-        <div className="analysis-buttons">
-          <button
-            className="generate-button"
-            onClick={handleGenerateDistribution}
+        <div className="form-group">
+          <label>Percentile Range:</label>
+          <select
+            value={distributionMinPercentile}
+            onChange={(e) =>
+              setDistributionMinPercentile(Number(e.target.value))
+            }
           >
-            Generate
-          </button>
+            {[0, 5, 10, 15, 20].map((val) => (
+              <option key={val} value={val}>
+                Min: {val}%
+              </option>
+            ))}
+          </select>
+          <select
+            value={distributionMaxPercentile}
+            onChange={(e) =>
+              setDistributionMaxPercentile(Number(e.target.value))
+            }
+          >
+            {[80, 85, 90, 95, 100].map((val) => (
+              <option key={val} value={val}>
+                Max: {val}%
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="buttons-container">
+          <button onClick={handleGenerateDistribution}>Generate</button>
           <button
-            className="clear-button"
             onClick={() => {
               setHeatMap(null);
             }}
@@ -495,7 +496,7 @@ function AnalysisOptions({ markers, setHeatMap }) {
         </div>
       </div>
 
-      <div className="options-section">
+      <div className="section">
         <h3>Cumulative Resource Influence</h3>
 
         <p className="tooltip">
@@ -504,7 +505,7 @@ function AnalysisOptions({ markers, setHeatMap }) {
           different services.
         </p>
 
-        <div className="inputs">
+        <div className="form-group">
           <label>Buffer Radius:</label>
 
           <select
@@ -517,21 +518,23 @@ function AnalysisOptions({ markers, setHeatMap }) {
               </option>
             ))}
           </select>
+        </div>
 
-          <label>
-            Decay Power:
-            <select
-              value={cumulativeDecayPower}
-              onChange={(e) => setCumulativeDecayPower(Number(e.target.value))}
-            >
-              {[0.5, 1, 2, 5, 10].map((val) => (
-                <option key={val} value={val}>
-                  {val}
-                </option>
-              ))}
-            </select>
-          </label>
+        <div className="form-group">
+          <label>Decay Power:</label>
+          <select
+            value={cumulativeDecayPower}
+            onChange={(e) => setCumulativeDecayPower(Number(e.target.value))}
+          >
+            {[0.5, 1, 2, 5, 10].map((val) => (
+              <option key={val} value={val}>
+                {val}
+              </option>
+            ))}
+          </select>
+        </div>
 
+        <div className="form-group">
           <label>Resolution:</label>
           <select
             value={cumulativeResolution}
@@ -543,7 +546,9 @@ function AnalysisOptions({ markers, setHeatMap }) {
               </option>
             ))}
           </select>
+        </div>
 
+        <div className="form-group">
           <label>Resource Type:</label>
           <select
             value={cumulativeResourceType}
@@ -557,45 +562,35 @@ function AnalysisOptions({ markers, setHeatMap }) {
             <option value="services">Services</option>
             <option value="amenities">Amenities</option>
           </select>
-
-          <label>Percentile Range:</label>
-          <div className="percentile-controls">
-            <select
-              value={cumulativeMinPercentile}
-              onChange={(e) =>
-                setCumulativeMinPercentile(Number(e.target.value))
-              }
-            >
-              {[0, 5, 10, 15, 20].map((val) => (
-                <option key={val} value={val}>
-                  Min: {val}%
-                </option>
-              ))}
-            </select>
-            <select
-              value={cumulativeMaxPercentile}
-              onChange={(e) =>
-                setCumulativeMaxPercentile(Number(e.target.value))
-              }
-            >
-              {[80, 85, 90, 95, 100].map((val) => (
-                <option key={val} value={val}>
-                  Max: {val}%
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
-        <div className="analysis-buttons">
-          <button
-            className="generate-button"
-            onClick={handleGenerateCumulative}
+        <div className="form-group">
+          <label>Percentile Range:</label>
+          <select
+            value={cumulativeMinPercentile}
+            onChange={(e) => setCumulativeMinPercentile(Number(e.target.value))}
           >
-            Generate
-          </button>
+            {[0, 5, 10, 15, 20].map((val) => (
+              <option key={val} value={val}>
+                Min: {val}%
+              </option>
+            ))}
+          </select>
+          <select
+            value={cumulativeMaxPercentile}
+            onChange={(e) => setCumulativeMaxPercentile(Number(e.target.value))}
+          >
+            {[80, 85, 90, 95, 100].map((val) => (
+              <option key={val} value={val}>
+                Max: {val}%
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="buttons-container">
+          <button onClick={handleGenerateCumulative}>Generate</button>
           <button
-            className="clear-button"
             onClick={() => {
               setHeatMap(null);
             }}
@@ -605,8 +600,8 @@ function AnalysisOptions({ markers, setHeatMap }) {
         </div>
       </div>
 
-      <div className="legend">
-        <h4>Color Legend:</h4>
+      <div className="section">
+        <h3>Color Legend:</h3>
         <ul>
           <li>
             <span></span> 🟢 = Well-Served / High Resource Zone

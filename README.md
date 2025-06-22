@@ -427,8 +427,6 @@ This simplifies UX and **dramatically increases speed** of data collection or su
 
 ### 🧩 Data Model (Minimalist Version)
 
----
-
 {
 id: "uuid-123",
 type: "Water Fountain",

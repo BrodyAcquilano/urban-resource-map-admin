@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AnalysisOptions from "../components/AnalysisOptions.jsx";
 import EditScoreModal from "../components/EditScoreModal.jsx";
-import "./Analysis.css";
+import '../styles/pages.css';
 
 function Analysis({
   markers,
@@ -17,7 +17,7 @@ function Analysis({
     <>
       {/* Analysis Options Panel Toggle + Panel */}
       <button
-        className={`options-side-toggle options-toggle ${
+        className={`side-toggle toggle ${
           showOptions? "" : "collapsed-toggle"
         }`}
         onClick={() => setShowOptions(!showOptions)}
@@ -25,7 +25,7 @@ function Analysis({
         ☰
       </button>
       <div
-        className={`options-overlay-panel options-panel-wrapper ${
+        className={`overlay-panel panel-wrapper ${
           showOptions ? "" : "collapsed"
         }`}
       >
@@ -34,7 +34,7 @@ function Analysis({
 
       {/* Centered EditScore Button */}
       <button
-        className="edit-score-button"
+        className="modal-button"
         onClick={() => setIsEditScoreModalOpen(true)}
       >
         ⭐

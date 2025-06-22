@@ -8,7 +8,8 @@ import {
   timeOptionsAMPM,
   timeAMPMToMinutes,
 } from "../data/dataModel.jsx";
-import "./FilterPanel.css";
+import "../styles/panels.css";
+import { renderCheckboxGroup } from "../utils/renderingHelpers.jsx";
 
 function FilterPanel({
   tileStyle,
@@ -33,11 +34,6 @@ function FilterPanel({
   const [amenityChecks, setAmenityChecks] = useState(
     initCheckedState(amenities)
   );
-
-  const handleCheckboxChange = (key, checks, setChecks) => {
-    // Toggle local checkbox state
-    setChecks((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
 
   useEffect(() => {
     const filterMinutes =
@@ -90,21 +86,26 @@ function FilterPanel({
     setFilteredMarkers,
   ]);
 
-  const renderCheckboxGroup = (title, checks, setChecks) => (
-    <section className="filter-group">
-      <h3>{title}</h3>
-      {Object.entries(checks).map(([label, checked]) => (
-        <label key={label}>
-          <input
-            type="checkbox"
-            checked={checked}
-            onChange={() => handleCheckboxChange(label, checks, setChecks)}
-          />
-          {label}
-        </label>
-      ))}
-    </section>
-  );
+  const handleResourceChange = (label, checked) => {
+    setResourceChecks((prev) => ({
+      ...prev,
+      [label]: checked,
+    }));
+  };
+
+  const handleServiceChange = (label, checked) => {
+    setServiceChecks((prev) => ({
+      ...prev,
+      [label]: checked,
+    }));
+  };
+
+  const handleAmenityChange = (label, checked) => {
+    setAmenityChecks((prev) => ({
+      ...prev,
+      [label]: checked,
+    }));
+  };
 
   useEffect(() => {
     const filterMinutes =
@@ -191,27 +192,27 @@ function FilterPanel({
   ]);
 
   return (
-    <div className="filter-panel">
-      <h2>Filters</h2>
+    <div className="panel">
+      <div className="section">
+        <h2>Filter Panel</h2>
+      </div>
 
-      <section className="filter-group">
+      <div className="section">
         <h3>Global Settings</h3>
 
-        <label>
-          Map Style:
+        <div className="form-group">
+          <label>Map Style:</label>
           <select
             value={tileStyle}
             onChange={(e) => setTileStyle(e.target.value)}
           >
             <option value="Standard">Standard</option>
-            <option value="Light">Light</option>
-            <option value="Dark">Dark</option>
             <option value="Terrain">Terrain</option>
           </select>
-        </label>
+        </div>
 
-        <label>
-          Day of Week:
+        <div className="form-group">
+          <label>Day of Week:</label>
           <select
             value={dayFilter}
             onChange={(e) => setDayFilter(e.target.value)}
@@ -223,10 +224,10 @@ function FilterPanel({
               </option>
             ))}
           </select>
-        </label>
+        </div>
 
-        <label>
-          Time of Day:
+        <div className="form-group">
+          <label>Time of Day:</label>
           <select
             value={timeFilter}
             onChange={(e) => setTimeFilter(e.target.value)}
@@ -238,21 +239,38 @@ function FilterPanel({
               </option>
             ))}
           </select>
-        </label>
+        </div>
 
-        <label>
-          <input
-            type="checkbox"
-            checked={wheelchairOnly}
-            onChange={() => setWheelchairOnly(!wheelchairOnly)}
-          />{" "}
-          ♿ Wheelchair Accessible
-        </label>
-      </section>
+        <div className="inline-checkbox-row">
+          <label className="label-container">♿ Wheelchair Accessible</label>
+          <div className="checkbox-container">
+            <input
+              type="checkbox"
+              checked={wheelchairOnly}
+              onChange={() => setWheelchairOnly(!wheelchairOnly)}
+            />
+          </div>
+        </div>
+      </div>
 
-      {renderCheckboxGroup("Resources", resourceChecks, setResourceChecks)}
-      {renderCheckboxGroup("Services", serviceChecks, setServiceChecks)}
-      {renderCheckboxGroup("Amenities", amenityChecks, setAmenityChecks)}
+      {renderCheckboxGroup(
+        "Resources",
+        resources,
+        resourceChecks,
+        handleResourceChange
+      )}
+      {renderCheckboxGroup(
+        "Services",
+        services,
+        serviceChecks,
+        handleServiceChange
+      )}
+      {renderCheckboxGroup(
+        "Amenities",
+        amenities,
+        amenityChecks,
+        handleAmenityChange
+      )}
     </div>
   );
 }

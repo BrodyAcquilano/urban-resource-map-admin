@@ -21,12 +21,15 @@ import Export from "./pages/Export.jsx";
 import Analysis from "./pages/Analysis.jsx"
 
 // ─────────────────────────────────────────────
+// 🎨  Style Imports
+// ─────────────────────────────────────────────
+import "./styles/App.css";
+
+// ─────────────────────────────────────────────
 // 🗺 Tile Style Options (Leaflet + OpenStreetMap)
 // ─────────────────────────────────────────────
 const TILE_STYLES = {
   Standard: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  Light: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-  Dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
   Terrain: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
 };
 
