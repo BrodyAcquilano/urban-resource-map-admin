@@ -19,6 +19,7 @@ router.post("/", async (req, res) => {
     resources,
     services,
     amenities,
+    scores,
   } = req.body;
 
   if (!name || !latitude || !longitude) {
@@ -39,6 +40,7 @@ router.post("/", async (req, res) => {
       resources: resources || {},
       services: services || {},
       amenities: amenities || {},
+      scores: scores || {},
       createdAt: new Date(),
     });
 
