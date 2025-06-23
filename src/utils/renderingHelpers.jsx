@@ -49,7 +49,7 @@ export function renderCheckboxGroup(title, items, values, onChange) {
 // Used in AddLocationModal.jsx to render checkboxes with notes
 export function renderCheckboxGroupWithNotes(title, items, values, onChange, notes) {
   return (
-    <div className="section">
+    <div>
       <h3>{title}</h3>
       {items.map((label) => (
         <div key={label} className="inline-checkbox-row">
