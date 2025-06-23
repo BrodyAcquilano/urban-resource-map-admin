@@ -46,6 +46,7 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
       resetForm();
       setPage(1);
       onClose();
+      alert("Location added!");
     } catch (err) {
       console.error("Submit failed:", err);
       window.alert("Failed to save location.");
