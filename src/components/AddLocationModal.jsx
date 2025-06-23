@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../styles/modals.css";
 import axios from "axios";
+import { renderCheckboxGroupWithNotes } from "../utils/renderingHelpers.jsx";
 
 import {
   daysOfWeek,
@@ -51,6 +52,57 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
       console.error("Submit failed:", err);
       window.alert("Failed to save location.");
     }
+  };
+
+  const handleResourceChange = (label, checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      resources: {
+        ...prev.resources,
+        [label]: checked,
+      },
+      scores: {
+        ...prev.scores,
+        resources: {
+          ...prev.scores.resources,
+          [label]: checked ? 3 : 0,
+        },
+      },
+    }));
+  };
+
+  const handleServiceChange = (label, checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      services: {
+        ...prev.services,
+        [label]: checked,
+      },
+      scores: {
+        ...prev.scores,
+        services: {
+          ...prev.scores.services,
+          [label]: checked ? 3 : 0,
+        },
+      },
+    }));
+  };
+
+  const handleAmenityChange = (label, checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      amenities: {
+        ...prev.amenities,
+        [label]: checked,
+      },
+      scores: {
+        ...prev.scores,
+        amenities: {
+          ...prev.scores.amenities,
+          [label]: checked ? 3 : 0,
+        },
+      },
+    }));
   };
 
   if (!isOpen) return null;
@@ -255,115 +307,32 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
             </table>
           </>
         )}
-        {page === 2 && (
-          <>
-            <h3>Resources</h3>
-            <div className="resources-list">
-              {resources.map((label) => (
-                <div key={label} className="inline-checkbox-row">
-                  <label className="label-container">{label}</label>
-                  <div className="checkbox-container">
-                    <input
-                      type="checkbox"
-                      checked={formData.resources[label]}
-                      onChange={(e) => {
-                        const checked = e.target.checked;
-                        setFormData((prev) => ({
-                          ...prev,
-                          resources: {
-                            ...prev.resources,
-                            [label]: checked,
-                          },
-                          scores: {
-                            ...prev.scores,
-                            resources: {
-                              ...prev.scores.resources,
-                              [label]: checked ? 3 : 0,
-                            },
-                          },
-                        }));
-                      }}
-                    />
-                  </div>
-                  <div className="notes-cell">{resourceNotes[label] || ""}</div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        {page === 3 && (
-          <>
-            <h3>Services</h3>
-            <div className="services-section">
-              {services.map((label) => (
-                <div key={label} className="inline-checkbox-row">
-                  <label className="label-container">{label}</label>
-                  <div className="checkbox-container">
-                    <input
-                      type="checkbox"
-                      checked={formData.services[label]}
-                      onChange={(e) => {
-                        const checked = e.target.checked;
-                        setFormData((prev) => ({
-                          ...prev,
-                          services: {
-                            ...prev.services,
-                            [label]: checked,
-                          },
-                          scores: {
-                            ...prev.scores,
-                            services: {
-                              ...prev.scores.services,
-                              [label]: checked ? 3 : 0,
-                            },
-                          },
-                        }));
-                      }}
-                    />
-                  </div>
-                  <div className="notes-cell">{serviceNotes[label] || ""}</div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+        {page === 2 &&
+          renderCheckboxGroupWithNotes(
+            "Resources",
+            resources,
+            formData.resources,
+            handleResourceChange,
+            resourceNotes
+          )}
 
-        {page === 4 && (
-          <>
-            <h3>Amenities</h3>
-            <div className="amenities-section">
-              {amenities.map((label) => (
-                <div key={label} className="inline-checkbox-row">
-                  <label className="label-container">{label}</label>
-                  <div className="checkbox-container">
-                    <input
-                      type="checkbox"
-                      checked={formData.amenities[label]}
-                      onChange={(e) => {
-                        const checked = e.target.checked;
-                        setFormData((prev) => ({
-                          ...prev,
-                          amenities: {
-                            ...prev.amenities,
-                            [label]: checked,
-                          },
-                          scores: {
-                            ...prev.scores,
-                            amenities: {
-                              ...prev.scores.amenities,
-                              [label]: checked ? 3 : 0,
-                            },
-                          },
-                        }));
-                      }}
-                    />
-                  </div>
-                  <div className="notes-cell">{amenityNotes[label] || ""}</div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+        {page === 3 &&
+          renderCheckboxGroupWithNotes(
+            "Services",
+            services,
+            formData.services,
+            handleServiceChange,
+            serviceNotes
+          )}
+
+        {page === 4 &&
+          renderCheckboxGroupWithNotes(
+            "Amenities",
+            amenities,
+            formData.amenities,
+            handleAmenityChange,
+            amenityNotes
+          )}
 
         <div className="buttons-container">
           {page > 1 && <button onClick={() => setPage(page - 1)}>Back</button>}

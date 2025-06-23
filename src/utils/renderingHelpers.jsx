@@ -45,3 +45,25 @@ export function renderCheckboxGroup(title, items, values, onChange) {
     </div>
   );
 }
+
+// Used in AddLocationModal.jsx to render checkboxes with notes
+export function renderCheckboxGroupWithNotes(title, items, values, onChange, notes) {
+  return (
+    <div className="section">
+      <h3>{title}</h3>
+      {items.map((label) => (
+        <div key={label} className="inline-checkbox-row">
+          <label className="label-container">{label}</label>
+          <div className="checkbox-container">
+            <input
+              type="checkbox"
+              checked={!!values[label]}
+              onChange={(e) => onChange(label, e.target.checked)}
+            />
+          </div>
+          <div className="notes-cell">{notes[label] || ""}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
