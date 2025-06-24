@@ -24,7 +24,7 @@ router.post("/", async (req, res) => {
     isLocationOpen,
     openHours,
     categories,
-    scores 
+    scores,
   } = req.body;
 
   if (!name || !latitude || !longitude) {
@@ -107,56 +107,6 @@ router.delete("/:id", async (req, res) => {
   try {
     const result = await db
       .collection(collectionName)
-      .deleteOne({ _id: new ObjectId(id) });
-
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ error: "Location not found" });
-    }
-
-    res.json({ message: "Location deleted" });
-  } catch (err) {
-    console.error("Delete failed:", err);
-    res.status(500).json({ error: "Failed to delete location" });
-  }
-});
-
-export default router;
-
-router.get("/", async (req, res) => {
-  const db = req.app.locals.db;
-
-  try {
-    const locations = await db.collection("locations").find().toArray();
-    res.json(locations);
-  } catch (err) {
-    console.error("Fetch failed:", err);
-    res.status(500).json({ error: "Failed to fetch locations" });
-  }
-});
-
-// PUT to update
-router.put("/:id", async (req, res) => {
-  const db = req.app.locals.db;
-  const { id } = req.params;
-
-  try {
-    const updateResult = await db
-      .collection("locations")
-      .updateOne({ _id: new ObjectId(id) }, { $set: req.body });
-    res.status(200).json({ message: "Location updated" });
-  } catch (err) {
-    console.error("Update failed:", err);
-    res.status(500).json({ error: "Failed to update location" });
-  }
-});
-
-router.delete("/:id", async (req, res) => {
-  const db = req.app.locals.db;
-  const { id } = req.params;
-
-  try {
-    const result = await db
-      .collection("locations")
       .deleteOne({ _id: new ObjectId(id) });
 
     if (result.deletedCount === 0) {
