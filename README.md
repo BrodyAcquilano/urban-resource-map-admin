@@ -15,8 +15,8 @@ Built with:
 
 I maintain **three separate versions** of this project:
 
-- **Admin Version (this repo):** Full editing, scoring, analysis, and export features. Includes the Editor Page and Edit Score Modal.
-- **Client Version (read-only):** Limited to viewing, filtering, and exporting. Editing and scoring tools are removed.
+- **Admin Version:** Full editing, scoring, analysis, and export features. Includes the Editor Page and Edit Score Modal.
+- **Client Version (read-only & mobile-friendly) :** Limited to viewing, filtering, and exporting. Editing and scoring tools are removed.
 - **Dev Version:** Experimental and in-progress features for future releases.
 
 Each version has a separate GitHub repository.  
