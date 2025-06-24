@@ -1,10 +1,9 @@
-// src/data/dataModel.jsx
+// src/data/locationHelpers.jsx
 
 // ────────────────
 // Keys and Labels
 // ────────────────
 
-// Used in: FilterPanel.jsx, AddLocationModal.jsx, EditLocation.jsx
 export const daysOfWeek = [
   "Monday",
   "Tuesday",
@@ -25,188 +24,58 @@ export const defaultOpenHours = Object.fromEntries(
   daysOfWeek.map((day) => [day, { open: "", close: "" }])
 );
 
-// Used in: FilterPanel.jsx, AddLocationModal.jsx, EditLocation.jsx, InfoPanel.jsx
-export const resources = [
-  "Warming Centre",
-  "Cooling Centre",
-  "Clean Air Space",
-  "Drinking Water",
-  "Meals",
-  "Shelter Space",
-  "Washrooms",
-  "Hygiene Products",
-  "Tampons or Pads",
-  "Showers",
-  "Community Centre",
-  "Food Bank",
-  "Clothing",
-  "Laundry",
-];
-
-// Used in: FilterPanel.jsx, AddLocationModal.jsx, EditLocation.jsx, InfoPanel.jsx
-export const services = [
-  "Health Services",
-  "Mental Health Services",
-  "Hospital",
-  "Addiction Services",
-  "Harm Reduction Services",
-  "Housing Services",
-  "Legal Aid Services",
-  "Employment Services",
-  "Financial Assistance Services",
-  "Identification Services",
-  "Interpretation Services",
-  "Community Outreach",
-  "Accessibility Services",
-  "Transportation Services",
-  "Daycare or child services",
-  "Drop-in Classes"
-];
-
-// Used in: FilterPanel.jsx, AddLocationModal.jsx, EditLocation.jsx, InfoPanel.jsx
-export const amenities = [
-  "Wi-Fi",
-  "Outdoor Power Outlets",
-  "Indoor Power Outlets",
-   "Storage/Lockers",
-  "Indoor Seating",
-  "Outdoor Seating",
-  "Pet Friendly",
-  "Quiet Space",
-  "Public Computer Access",
-  "Library",
-  "Art or Music Programs",
-  "Exercise Space",
-  "Social Space",
-  "Private Space",
-  "Low-Intervention Environment",
-  "Nap or Sleep",
-  "No Purchases Required",
-  "Coffee Shop",
-  "Shopping Centre",
-  "Restaurant",
-  "Groceries",
-  "Public Access",
-  "Request Access",
-  "All Ages",
-  "Senior Centre",
-  "Youth Centre",
-  "Printers",
-  "Phone Access",
-  "Community Fridge",
-  "Little Library",
-  "Park or scenic area",
-  "Art Display Space",
-  "Vending Machines",
-  "Microwave Access",
-];
-
-// Used in: AddLocationModal.jsx
-export const resourceNotes = {
-  "Warming Centre": "Indoor space to stay warm during cold weather",
-  "Cooling Centre": "Indoor space to stay cool during extreme heat",
-  "Clean Air Space": "Shelter from smoke, pollution, or poor air quality",
-  "Drinking Water": "Access to safe water for drinking or refilling bottles",
-  "Meals": "Prepared food provided for free or at low cost",
-  "Shelter Space": "Place to sleep overnight, may have limited capacity",
-  "Washrooms": "Toilets available for public use",
-  "Hygiene Products": "Free soap, toothbrushes, or other hygiene supplies",
-  "Tampons or Pads": "Free menstrual products available",
-  "Showers": "Facilities to bathe or freshen up",
-  "Community Centre": "Public building with programs or general support",
-  "Food Bank": "Free groceries or non-perishable food available",
-  "Clothing": "Free or low-cost clothes, sometimes seasonal",
-  "Laundry": "Washer and dryer access, may be supervised or self-serve",
-};
-
-// Used in: AddLocationModal.jsx
-export const serviceNotes = {
-  "Health Services": "General medical care",
-  "Hospital": "Emergency health services",
-  "Mental Health Services": "Counseling or crisis support",
-  "Addiction Services": "Substance use support",
-  "Harm Reduction Services": "Supplies or education",
-  "Housing Services": "Transitional or emergency housing support",
-  "Legal Aid Services": "Access to legal help",
-  "Employment Services": "Job training or search assistance",
-  "Financial Assistance Services": "Direct aid or financial advice",
-  "Identification Services": "Help obtaining IDs or documents",
-  "Interpretation Services": "Language support",
-  "Community Outreach": "Street outreach and mobile help",
-  "Accessibility Services": "Help navigating barriers or providing accessible equipment",
-  "Transportation Services": "Public transportation terminal or intercity bus stop",
-  "Daycare or child services": "Childminding, early learning, or parent relief available",
-  "Drop-in Classes": "Casual educational or creative sessions open to the public",
-};
-
-// Used in: AddLocationModal.jsx
-export const amenityNotes = {
-  "Wi-Fi": "Public wireless internet access",
-  "Outdoor Power Outlets":"Public electrical outlets available outside",
-  "Indoor Power Outlets":"Electrical outlets available indoors",
-  "Storage/Lockers":"Secure space to store personal belongings",
-  "Indoor Seating": "Safe indoor places to sit and rest",
-  "Outdoor Seating": "Benches or sheltered outdoor areas",
-  "Pet Friendly": "Allows animals or has accommodations for pets",
-  "Quiet Space": "Noise-free or calm areas for rest or focus",
-  "Public Computer Access": "Workstations with internet or tools",
-  "Library": "Books, reading space, or educational resources",
-  "Art or Music Programs": "Creative drop-ins or workshops",
-  "Exercise Space": "Room to walk, stretch, or do light fitness",
-  "Social Space": "Supports informal interaction or community",
-  "Private Space": "Places to be alone or with limited supervision",
-  "Low-Intervention Environment": "You’re unlikely to be asked to leave",
-  "Nap or Sleep": "Comfortable seating or space to lay down",
-  "No Purchases Required": "You can access this space without buying something",
-  "Coffee Shop": "Offers seating or Wi-Fi, usually requires a purchase",
-  "Shopping Centre": "Malls or plazas you can walk around or hang out",
-  "Restaurant": "Prepared meals available, typically for purchase",
-  "Groceries": "Fresh or packaged food available to buy",
-  "Public Access": "Open to everyone without restriction",
-  "Request Access": "You must ask or sign up before using resources",
-  "All Ages": "Available to people of any age",
-  "Senior Centre": "Primarily serves seniors (ages 55+ or 65+)",
-  "Youth Centre": "Primarily serves youth (typically under 25)",
-  "Printers": "Print documents here, may require staff help or small fee",
-   "Phone Access":"Landline, payphone, or shared phone available for calls",
-  "Community Fridge": "A shared fridge where anyone can take or leave food",
-  "Little Library": "Free book exchange - take one, leave one",
-  "Park or scenic area" : "Outdoor space with greenery, shade, or natural beauty",
-  "Art Display Space":"Public exhibits featuring community art or creative work",
-  "Vending Machines":"Snacks or drinks available for purchase onsite",
-  "Microwave Access": "You can heat up food here",
-};
-
 // ────────────────
-// Initialization
+// Dynamic Initialization Helpers
 // ────────────────
 
-//Used in itialLocationData()
-export const defaultScores = {
-  resources: Object.fromEntries(resources.map((r) => [r, 0])),
-  services: Object.fromEntries(services.map((s) => [s, 0])),
-  amenities: Object.fromEntries(amenities.map((a) => [a, 0])),
-};
+// Build default categories and scores based on the current schema
+export function buildDefaultCategories(schema) {
+  const categories = {};
+  schema.categories.forEach((category) => {
+    categories[category.categoryName] = Object.fromEntries(
+      category.items.map((item) => [item.label, false])
+    );
+  });
+  return categories;
+}
 
-//Used in: AddLocationModal.jsx to initialize a new location object using default values, before setting them manually.
-export const initialLocationData = {
-  name: "",
-  latitude: "",
-  longitude: "",
-  address: "",
-  website: "",
-  phone: "",
-  wheelchairAccessible: false,
-  isLocationOpen: { ...defaultIsLocationOpen },
-  openHours: { ...defaultOpenHours },
-  resources: Object.fromEntries(resources.map((label) => [label, false])),
-  services: Object.fromEntries(services.map((label) => [label, false])),
-  amenities: Object.fromEntries(amenities.map((label) => [label, false])),
-   scores: JSON.parse(JSON.stringify(defaultScores)),
-};
+export function buildDefaultScores(schema) {
+  const scores = {};
+  schema.categories.forEach((category) => {
+    scores[category.categoryName] = Object.fromEntries(
+      category.items.map((item) => [item.label, 0])
+    );
+  });
+  return scores;
+}
 
-// Used in: EditLocation.jsx and EditScoreModal.jsx for initializing states to the values from the selected Location.
-export function getSafeLocationData(raw = {}) {
+// Used to initialize a new location
+export function initializeLocationData(schema) {
+  return {
+    name: "",
+    latitude: "",
+    longitude: "",
+    address: "",
+    website: "",
+    phone: "",
+    wheelchairAccessible: false,
+    isLocationOpen: { ...defaultIsLocationOpen },
+    openHours: { ...defaultOpenHours },
+    categories: buildDefaultCategories(schema),
+    scores: buildDefaultScores(schema),
+  };
+}
+
+// Used to safely load existing location data into forms
+export function getSafeLocationData(raw = {}, schema) {
+  const safeCategories = {};
+  schema.categories.forEach((category) => {
+    safeCategories[category.categoryName] = {
+      ...Object.fromEntries(category.items.map((item) => [item.label, false])),
+      ...(raw.categories?.[category.categoryName] || {}),
+    };
+  });
+
   return {
     name: raw.name || "",
     latitude: raw.latitude || "",
@@ -217,35 +86,10 @@ export function getSafeLocationData(raw = {}) {
     wheelchairAccessible: !!raw.wheelchairAccessible,
     isLocationOpen: raw.isLocationOpen || { ...defaultIsLocationOpen },
     openHours: raw.openHours || { ...defaultOpenHours },
-    resources: {
-      ...Object.fromEntries(resources.map((r) => [r, false])),
-      ...(raw.resources || {}),
-    },
-    services: {
-      ...Object.fromEntries(services.map((s) => [s, false])),
-      ...(raw.services || {}),
-    },
-    amenities: {
-      ...Object.fromEntries(amenities.map((a) => [a, false])),
-      ...(raw.amenities || {}),
-    },
-    scores: {
-      resources: {
-        ...Object.fromEntries(resources.map((r) => [r, 0])),
-        ...(raw.scores?.resources || {}),
-      },
-      services: {
-        ...Object.fromEntries(services.map((s) => [s, 0])),
-        ...(raw.scores?.services || {}),
-      },
-      amenities: {
-        ...Object.fromEntries(amenities.map((a) => [a, 0])),
-        ...(raw.scores?.amenities || {}),
-      },
-    },
+    categories: safeCategories,
+    scores: raw.scores || {}, 
   };
 }
-
 
 
 // ────────────────
@@ -344,7 +188,6 @@ export function validateOpenCloseTimes(openHours, isLocationOpen) {
 
   return true;
 }
-
 
 /* 
 ────────────────────────────────────────────────────

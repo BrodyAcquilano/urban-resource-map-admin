@@ -1,27 +1,37 @@
+// src/components/AnalysisOptions.jsx
+
 import React, { useState } from "react";
 import * as turf from "@turf/turf";
 import "../styles/panels.css";
 
-function AnalysisOptions({ markers, setHeatMap }) {
-  //state for Proximity Influence Zones
+function AnalysisOptions({ markers, setHeatMap, currentSchema }) {
+  const categories = currentSchema?.categories || [];
+  const categoryNames = categories.map((cat) => cat.categoryName);
+
+  const allOptions = [
+    "all",
+    ...categoryNames,
+    ...categoryNames.flatMap((cat1, i) =>
+      categoryNames.slice(i + 1).map((cat2) => `${cat1}_${cat2}`)
+    ),
+  ];
+
   const [proximityBufferRadius, setProximityBufferRadius] = useState(1000);
   const [proximityResolution, setProximityResolution] = useState(100);
   const [proximityDecay, setProximityDecay] = useState("slow");
 
-  //state for Resource Distirbution Mapping
   const [distributionBufferRadius, setDistributionBufferRadius] =
     useState(1000);
   const [distributionResolution, setDistributionResolution] = useState(100);
-  const [distributionResourceType, setDistributionResourceType] =
+  const [distributionCategoryType, setDistributionCategoryType] =
     useState("all");
   const [distributionMinPercentile, setDistributionMinPercentile] = useState(0);
   const [distributionMaxPercentile, setDistributionMaxPercentile] =
     useState(100);
 
-  //state for Cumulative Resource Influence
   const [cumulativeBufferRadius, setCumulativeBufferRadius] = useState(1000);
   const [cumulativeResolution, setCumulativeResolution] = useState(100);
-  const [cumulativeResourceType, setCumulativeResourceType] = useState("all");
+  const [cumulativeCategoryType, setCumulativeCategoryType] = useState("all");
   const [cumulativeMinPercentile, setCumulativeMinPercentile] = useState(0);
   const [cumulativeMaxPercentile, setCumulativeMaxPercentile] = useState(100);
   const [cumulativeDecayPower, setCumulativeDecayPower] = useState(1);
@@ -39,7 +49,7 @@ function AnalysisOptions({ markers, setHeatMap }) {
 
   function interpolateColor(value) {
     value = Math.max(0, Math.min(1, value));
-    const hue = value * 120; // 0 = red, 120 = green
+    const hue = value * 120;
     return `hsl(${hue}, 100%, 50%)`;
   }
 
@@ -55,47 +65,45 @@ function AnalysisOptions({ markers, setHeatMap }) {
 
   const distributionGetScore = (marker) => {
     let types = [];
-    if (distributionResourceType === "all") {
-      types = ["resources", "services", "amenities"];
-    } else if (distributionResourceType === "resources_amenities") {
-      types = ["resources", "amenities"];
-    } else if (distributionResourceType === "resources_services") {
-      types = ["resources", "services"];
-    } else if (distributionResourceType === "services_amenities") {
-      types = ["services", "amenities"];
+
+    if (distributionCategoryType === "all") {
+      types = categoryNames;
+    } else if (distributionCategoryType.includes("_")) {
+      types = distributionCategoryType.split("_");
     } else {
-      types = [distributionResourceType];
+      types = [distributionCategoryType];
     }
 
     const allScores = types.map((type) =>
-      calculateScore(marker.scores?.[type], marker[type])
+      calculateScore(marker.scores?.[type], marker.categories?.[type])
     );
+
     return allScores.reduce((a, b) => a + b, 0) / allScores.length;
   };
 
   const cumulativeGetScore = (marker) => {
     let types = [];
-    if (cumulativeResourceType === "all") {
-      types = ["resources", "services", "amenities"];
-    } else if (cumulativeResourceType === "resources_amenities") {
-      types = ["resources", "amenities"];
-    } else if (cumulativeResourceType === "resources_services") {
-      types = ["resources", "services"];
-    } else if (cumulativeResourceType === "services_amenities") {
-      types = ["services", "amenities"];
+
+    if (cumulativeCategoryType === "all") {
+      types = categoryNames;
+    } else if (cumulativeCategoryType.includes("_")) {
+      types = cumulativeCategoryType.split("_");
     } else {
-      types = [cumulativeResourceType];
+      types = [cumulativeCategoryType];
     }
 
     const allScores = types.map((type) =>
-      calculateScore(marker.scores?.[type], marker[type])
+      calculateScore(marker.scores?.[type], marker.categories?.[type])
     );
+
     return allScores.reduce((a, b) => a + b, 0) / allScores.length;
   };
 
   const handleGenerateProximity = () => {
     const allPoints = markers.map((m) =>
-      turf.point([m.longitude, m.latitude], { marker: m })
+      turf.point([parseFloat(m.longitude), parseFloat(m.latitude)], {
+        marker: m,
+      })
     );
 
     const bbox = turf.bbox(turf.featureCollection(allPoints));
@@ -126,7 +134,7 @@ function AnalysisOptions({ markers, setHeatMap }) {
         for (const m of markers) {
           const dist = turf.distance(
             pixelPoint,
-            turf.point([m.longitude, m.latitude]),
+            turf.point([parseFloat(m.longitude), parseFloat(m.latitude)]),
             { units: "kilometers" }
           );
 
@@ -165,7 +173,6 @@ function AnalysisOptions({ markers, setHeatMap }) {
   };
 
   const handleGenerateDistribution = () => {
-    // Step 1: Score and normalize markers
     const scoredMarkers = markers.map((m) => ({
       ...m,
       score: distributionGetScore(m),
@@ -180,9 +187,8 @@ function AnalysisOptions({ markers, setHeatMap }) {
       normalized: normalize(m.score, min, max),
     }));
 
-    // Step 2: Calculate bounds
     const allPoints = normalizedMarkers.map((m) =>
-      turf.point([m.longitude, m.latitude])
+      turf.point([parseFloat(m.longitude), parseFloat(m.latitude)])
     );
     const bbox = turf.bbox(turf.featureCollection(allPoints));
     let [minLng, minLat, maxLng, maxLat] = bbox;
@@ -194,7 +200,6 @@ function AnalysisOptions({ markers, setHeatMap }) {
     minLat -= expandLat;
     maxLat += expandLat;
 
-    // Step 3: Iterate grid and calculate weighted influence
     const cols = distributionResolution;
     const rows = distributionResolution;
     const latStep = (maxLat - minLat) / rows;
@@ -242,7 +247,6 @@ function AnalysisOptions({ markers, setHeatMap }) {
       }
     }
 
-    // Step 4: Output result
     setHeatMap({
       pixels,
       bounds: [
@@ -253,7 +257,6 @@ function AnalysisOptions({ markers, setHeatMap }) {
   };
 
   const handleGenerateCumulative = () => {
-    // Step 1: Score and normalize markers
     const scoredMarkers = markers.map((m) => ({
       ...m,
       score: cumulativeGetScore(m),
@@ -268,9 +271,8 @@ function AnalysisOptions({ markers, setHeatMap }) {
       normalized: normalize(m.score, min, max),
     }));
 
-    // Step 2: Calculate bounds
     const allPoints = normalizedMarkers.map((m) =>
-      turf.point([m.longitude, m.latitude])
+      turf.point([parseFloat(m.longitude), parseFloat(m.latitude)])
     );
     const bbox = turf.bbox(turf.featureCollection(allPoints));
     let [minLng, minLat, maxLng, maxLat] = bbox;
@@ -282,7 +284,6 @@ function AnalysisOptions({ markers, setHeatMap }) {
     minLat -= expandLat;
     maxLat += expandLat;
 
-    // Step 3: Iterate grid and integrate influence
     const cols = cumulativeResolution;
     const rows = cumulativeResolution;
     const latStep = (maxLat - minLat) / rows;
@@ -325,7 +326,6 @@ function AnalysisOptions({ markers, setHeatMap }) {
       }
     }
 
-    // Step 4: Output result
     setHeatMap({
       pixels,
       bounds: [
@@ -344,12 +344,12 @@ function AnalysisOptions({ markers, setHeatMap }) {
       <div className="section">
         <h3>Proximity Influence Zones</h3>
         <p className="tooltip">
-          A measure of closeness. Having many locations close together is a good
-          indicator of high resource value.
+          Measures closeness. Clusters of nearby locations are a good indicator
+          of high resource zones.
         </p>
 
         <div className="form-group">
-          <label>Buffer Radius (m):</label>
+          <label>Buffer Radius (m)::</label>
           <select
             value={proximityBufferRadius}
             onChange={(e) => setProximityBufferRadius(Number(e.target.value))}
@@ -441,23 +441,25 @@ function AnalysisOptions({ markers, setHeatMap }) {
         </div>
 
         <div className="form-group">
-          <label>Resource Type:</label>
+          <label>Category Type:</label>
           <select
-            value={distributionResourceType}
-            onChange={(e) => setDistributionResourceType(e.target.value)}
+            value={distributionCategoryType}
+            onChange={(e) => setDistributionCategoryType(e.target.value)}
           >
-            <option value="all">All</option>
-            <option value="resources_amenities">Resources + Amenities</option>
-            <option value="resources_services">Resources + Services</option>
-            <option value="services_amenities">Services + Amenities</option>
-            <option value="resources">Resources</option>
-            <option value="services">Services</option>
-            <option value="amenities">Amenities</option>
+            {allOptions.map((option) => (
+              <option key={option} value={option}>
+                {option === "all"
+                  ? "All"
+                  : option.includes("_")
+                  ? option.split("_").join(" + ")
+                  : option}
+              </option>
+            ))}
           </select>
         </div>
 
         <div className="form-group">
-          <label>Percentile Range:</label>
+          <label>Percentile Range: </label>
           <select
             value={distributionMinPercentile}
             onChange={(e) =>
@@ -500,13 +502,11 @@ function AnalysisOptions({ markers, setHeatMap }) {
         <h3>Cumulative Resource Influence</h3>
 
         <p className="tooltip">
-          This type of calculation highlights the added value of resource
-          sharing within communities and shows the interconnectedness of
-          different services.
+          Highlights the added value of sharing resources and overlapping areas.
         </p>
 
         <div className="form-group">
-          <label>Buffer Radius:</label>
+          <label>Buffer Radius (m):</label>
 
           <select
             value={cumulativeBufferRadius}
@@ -549,18 +549,20 @@ function AnalysisOptions({ markers, setHeatMap }) {
         </div>
 
         <div className="form-group">
-          <label>Resource Type:</label>
+          <label>Category Type:</label>
           <select
-            value={cumulativeResourceType}
-            onChange={(e) => setCumulativeResourceType(e.target.value)}
+            value={cumulativeCategoryType}
+            onChange={(e) => setCumulativeCategoryType(e.target.value)}
           >
-            <option value="all">All</option>
-            <option value="resources_amenities">Resources + Amenities</option>
-            <option value="resources_services">Resources + Services</option>
-            <option value="services_amenities">Services + Amenities</option>
-            <option value="resources">Resources</option>
-            <option value="services">Services</option>
-            <option value="amenities">Amenities</option>
+            {allOptions.map((option) => (
+              <option key={option} value={option}>
+                {option === "all"
+                  ? "All"
+                  : option.includes("_")
+                  ? option.split("_").join(" + ")
+                  : option}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -602,20 +604,12 @@ function AnalysisOptions({ markers, setHeatMap }) {
 
       <div className="section">
         <h3>Color Legend:</h3>
-        <ul>
-          <li>
-            <span></span> 🟢 = Well-Served / High Resource Zone
-          </li>
-          <li>
-            <span></span> 🟡 = Moderately Served / Stable but Limited
-          </li>
-          <li>
-            <span></span> 🟠 = Under-Served / Needs Attention
-          </li>
-          <li>
-            <span></span> 🔴 = Critical Shortage / Resource Desert
-          </li>
-        </ul>
+      <ul>
+  <li>🟢 = Well-Served / High Resource Zone</li>
+  <li>🟡 = Moderately Served / Stable but Limited</li>
+  <li>🟠 = Under-Served / Needs Attention</li>
+  <li>🔴 = Critical Shortage / Resource Desert</li>
+</ul>
       </div>
     </div>
   );

@@ -6,6 +6,11 @@ import { Routes, Route } from "react-router-dom";
 import axios from "axios";
 
 // ─────────────────────────────────────────────
+// 📫 API HELPERS
+// ─────────────────────────────────────────────
+import { fetchAllSchemas } from "./utils/schemaFetcher.js";
+
+// ─────────────────────────────────────────────
 // 🧩 Core Component Imports
 // ─────────────────────────────────────────────
 import Header from "./components/Header.jsx";
@@ -38,30 +43,54 @@ function App() {
   // 📊 Global State for Map + UI
   // ─────────────────────────────────────────────
 
-  const [selectedFilters, setSelectedFilters] = useState([]); //List of currently applied filters for exporting
-  const [markers, setMarkers] = useState([]); // All location data from the database
-  const [filteredMarkers, setFilteredMarkers] = useState([]); // Filtered set of markers to display on the map
-  const [showFilter, setShowFilter] = useState(false); // Toggle for Filter Panel
-  const [selectedLocation, setSelectedLocation] = useState(null); // Selected location for Info or Edit or Export
-  const [tileStyle, setTileStyle] = useState("Standard"); // Current tile map style
+  const [schemas, setSchemas] = useState([]);
+  const [currentSchema, setCurrentSchema] = useState(null);
+  const [currentCollection, setCurrentCollection] = useState("");
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [markers, setMarkers] = useState([]);
+  const [filteredMarkers, setFilteredMarkers] = useState([]);
+  const [showFilter, setShowFilter] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [tileStyle, setTileStyle] = useState("Standard");
   const [mapCenter, setMapCenter] = useState([43.4516, -80.4925]);
   const [mapZoom, setMapZoom] = useState(13);
-  const [heatMap, setHeatMap]=useState([]);
+  const [heatMap, setHeatMap] = useState([]);
 
   const BASE_URL = import.meta.env.VITE_API_URL;
 
-  // 📡 Fetch all markers once on app load
+  // 📡 Fetch all schemas and default markers on app load
   useEffect(() => {
+    const loadSchemas = async () => {
+      const loadedSchemas = await fetchAllSchemas();
+      setSchemas(loadedSchemas);
+
+      if (loadedSchemas.length > 0) {
+        // Set first schema as default
+        setCurrentSchema(loadedSchemas[0]);
+        setCurrentCollection(loadedSchemas[0].collectionName);
+      }
+    };
+
+    loadSchemas();
+  }, []);
+
+  // 📡 Fetch markers when the current collection changes
+  useEffect(() => {
+    if (!currentCollection) return;
+
     const fetchMarkers = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/locations`);
+        const res = await axios.get(`${BASE_URL}/api/locations`, {
+          params: { collectionName: currentCollection },
+        });
         setMarkers(res.data);
       } catch (err) {
         console.error("Failed to fetch markers:", err);
       }
     };
+
     fetchMarkers();
-  }, []);
+  }, [currentCollection]);
 
   // ─────────────────────────────────────────────
   // ⚙️ App Structure & Routing
@@ -77,101 +106,103 @@ function App() {
   //
   // This design improves performance and enables smooth workflow transitions.
 
-  return (
-    <div className="app-container">
-      {/* Top Navigation Header */}
-      <Header />
-      {/* Invisible map used for export snapshot */}
-      <OffscreenMap
+ return (
+  <div className="app-container">
+    {/* Top Navigation Header */}
+    <Header />
+
+    {/* Invisible map used for export snapshot */}
+    <OffscreenMap
+      tileUrl={TILE_STYLES[tileStyle]}
+      filteredMarkers={filteredMarkers}
+      center={mapCenter}
+      zoom={mapZoom}
+    />
+
+    {/* Main UI Layer */}
+    <div className="main-layer">
+      {/* Filter Panel Toggle Button */}
+      <button
+        className={`filter-side-toggle filter-toggle ${showFilter ? "" : "collapsed-toggle"}`}
+        onClick={() => setShowFilter(!showFilter)}
+      >
+        ☰
+      </button>
+
+      {/* Filter Panel */}
+      <div className={`filter-overlay-panel filter-panel-wrapper ${showFilter ? "" : "collapsed"}`}>
+        <FilterPanel
+          schemas={schemas} 
+          currentSchema={currentSchema} 
+          setCurrentSchema={setCurrentSchema} 
+          setCurrentCollection={setCurrentCollection} 
+          tileStyle={tileStyle}
+          setTileStyle={setTileStyle}
+          markers={markers}
+          setFilteredMarkers={setFilteredMarkers}
+          setSelectedFilters={setSelectedFilters}
+          setSelectedLocation={setSelectedLocation}
+        />
+      </div>
+
+      {/* Map Display */}
+      <MapPanel
         tileUrl={TILE_STYLES[tileStyle]}
         filteredMarkers={filteredMarkers}
-        center={mapCenter}
-        zoom={mapZoom}
+        setSelectedLocation={setSelectedLocation}
+        setMapCenter={setMapCenter}
+        setMapZoom={setMapZoom}
+        heatMap={heatMap}
+        setHeatMap={setHeatMap}
       />
 
-      {/* Main UI Layer */}
-      <div className="main-layer">
-        {/* Filter Panel Toggle Button */}
-        <button
-          className={`filter-side-toggle filter-toggle ${
-            showFilter ? "" : "collapsed-toggle"
-          }`}
-          onClick={() => setShowFilter(!showFilter)}
-        >
-          ☰
-        </button>
-
-        {/* Filter Panel */}
-        <div
-          className={`filter-overlay-panel filter-panel-wrapper ${
-            showFilter ? "" : "collapsed"
-          }`}
-        >
-          <FilterPanel
-            tileStyle={tileStyle}
-            setTileStyle={setTileStyle}
-            markers={markers}
-            setFilteredMarkers={setFilteredMarkers}
-            setSelectedFilters={setSelectedFilters}
-          />
-        </div>
-
-        {/* Map Display */}
-        <MapPanel
-          tileUrl={TILE_STYLES[tileStyle]}
-          filteredMarkers={filteredMarkers}
-          setSelectedLocation={setSelectedLocation}
-          setMapCenter={setMapCenter}
-          setMapZoom={setMapZoom}
-          heatMap={heatMap}
-          setHeatMap={setHeatMap}
+      {/* Page Routing */}
+      <Routes>
+        <Route path="/" element={<Home selectedLocation={selectedLocation} currentSchema={currentSchema} />} />
+        <Route
+          path="/editor"
+          element={
+            <Editor
+              setMarkers={setMarkers}
+              selectedLocation={selectedLocation}
+              setSelectedLocation={setSelectedLocation}
+              currentSchema={currentSchema}
+              currentCollection={currentCollection} 
+            />
+          }
         />
-
-        {/* Page Routing */}
-        <Routes>
-          <Route
-            path="/"
-            element={<Home selectedLocation={selectedLocation} />}
-          />
-          <Route
-            path="/editor"
-            element={
-              <Editor
-                setMarkers={setMarkers}
-                selectedLocation={selectedLocation}
-                setSelectedLocation={setSelectedLocation}
-              />
-            }
-          />
-          <Route
-            path="/export"
-            element={
-              <Export
-                filteredMarkers={filteredMarkers}
-                selectedLocation={selectedLocation}
-                selectedFilters={selectedFilters}
-              />
-            }
-          />
-           <Route
-            path="/analysis"
-            element={
-              <Analysis
+        <Route
+          path="/export"
+          element={
+            <Export
+              filteredMarkers={filteredMarkers}
+              selectedLocation={selectedLocation}
+              selectedFilters={selectedFilters}
+            />
+          }
+        />
+        <Route
+          path="/analysis"
+          element={
+            <Analysis
               markers={markers}
               setMarkers={setMarkers}
               selectedLocation={selectedLocation}
               setSelectedLocation={setSelectedLocation}
               setHeatMap={setHeatMap}
-              />
-            }
-          />
-        </Routes>
-      </div>
+              currentSchema={currentSchema}
+              currentCollection={currentCollection}
+            />
+          }
+        />
+      </Routes>
     </div>
-  );
+  </div>
+);
 }
 
 export default App;
+
 
 // ─────────────────────────────────────────────
 // 🌐 REACT APP STRUCTURE & GLOBAL WORKFLOWS

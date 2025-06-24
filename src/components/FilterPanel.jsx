@@ -1,43 +1,43 @@
 // src/components/FilterPanel.jsx
 import React, { useState, useEffect } from "react";
-import {
-  daysOfWeek,
-  resources,
-  services,
-  amenities,
-  timeOptionsAMPM,
-  timeAMPMToMinutes,
-} from "../data/dataModel.jsx";
+import { daysOfWeek, timeOptionsAMPM, timeAMPMToMinutes } from "../utils/locationHelpers.jsx";
 import "../styles/panels.css";
-import { renderCheckboxGroup } from "../utils/renderingHelpers.jsx";
+import { renderCheckboxGroupBySchema } from "../utils/renderingHelpers.jsx";
+import { fetchSchemaByProjectName } from "../utils/schemaFetcher.js";
 
 function FilterPanel({
+  schemas,
+  currentSchema,
+  setCurrentSchema,
+  setCurrentCollection,
   tileStyle,
   setTileStyle,
   markers,
   setFilteredMarkers,
   setSelectedFilters,
+  setSelectedLocation
 }) {
   const [wheelchairOnly, setWheelchairOnly] = useState(false);
   const [dayFilter, setDayFilter] = useState("Any");
   const [timeFilter, setTimeFilter] = useState("Any");
 
-  const initCheckedState = (labels) =>
-    Object.fromEntries(labels.map((label) => [label, false]));
+  // Initialize dynamic checkboxes
+  const initCheckedState = () => {
+    if (!currentSchema) return {};
+   return Object.fromEntries(
+  currentSchema.categories.flatMap((cat) => cat.items.map((item) => [item.label, false]))
+);
+  };
 
-  const [resourceChecks, setResourceChecks] = useState(
-    initCheckedState(resources)
-  );
-  const [serviceChecks, setServiceChecks] = useState(
-    initCheckedState(services)
-  );
-  const [amenityChecks, setAmenityChecks] = useState(
-    initCheckedState(amenities)
-  );
+  const [categoryChecks, setCategoryChecks] = useState(initCheckedState);
 
   useEffect(() => {
-    const filterMinutes =
-      timeFilter !== "Any" ? timeAMPMToMinutes(timeFilter) : null;
+    setCategoryChecks(initCheckedState());
+  }, [currentSchema]);
+
+  // Filter logic
+  useEffect(() => {
+    const filterMinutes = timeFilter !== "Any" ? timeAMPMToMinutes(timeFilter) : null;
 
     const matchesFilter = (marker) => {
       if (wheelchairOnly && !marker.wheelchairAccessible) return false;
@@ -61,88 +61,8 @@ function FilterPanel({
         if (!matchesAny) return false;
       }
 
-      const allChecks = [
-        [resourceChecks, marker.resources],
-        [serviceChecks, marker.services],
-        [amenityChecks, marker.amenities],
-      ];
-
-      return allChecks.every(([checks, values]) =>
-        Object.entries(checks).every(([key, active]) =>
-          active ? values?.[key] : true
-        )
-      );
-    };
-
-    setFilteredMarkers(markers.filter(matchesFilter));
-  }, [
-    markers,
-    wheelchairOnly,
-    dayFilter,
-    timeFilter,
-    resourceChecks,
-    serviceChecks,
-    amenityChecks,
-    setFilteredMarkers,
-  ]);
-
-  const handleResourceChange = (label, checked) => {
-    setResourceChecks((prev) => ({
-      ...prev,
-      [label]: checked,
-    }));
-  };
-
-  const handleServiceChange = (label, checked) => {
-    setServiceChecks((prev) => ({
-      ...prev,
-      [label]: checked,
-    }));
-  };
-
-  const handleAmenityChange = (label, checked) => {
-    setAmenityChecks((prev) => ({
-      ...prev,
-      [label]: checked,
-    }));
-  };
-
-  useEffect(() => {
-    const filterMinutes =
-      timeFilter !== "Any" ? timeAMPMToMinutes(timeFilter) : null;
-
-    const matchesFilter = (marker) => {
-      if (wheelchairOnly && !marker.wheelchairAccessible) return false;
-
-      if (dayFilter !== "Any") {
-        if (!marker.isLocationOpen?.[dayFilter]) return false;
-        if (filterMinutes !== null) {
-          const hours = marker.openHours?.[dayFilter];
-          const open = timeAMPMToMinutes(hours?.open || "12:00 a.m.");
-          const close = timeAMPMToMinutes(hours?.close || "12:00 a.m.");
-          if (filterMinutes < open || filterMinutes > close) return false;
-        }
-      } else if (filterMinutes !== null) {
-        const matchesAny = daysOfWeek.some((day) => {
-          if (!marker.isLocationOpen?.[day]) return false;
-          const hours = marker.openHours?.[day];
-          const open = timeAMPMToMinutes(hours?.open || "12:00 a.m.");
-          const close = timeAMPMToMinutes(hours?.close || "12:00 a.m.");
-          return filterMinutes >= open && filterMinutes <= close;
-        });
-        if (!matchesAny) return false;
-      }
-
-      const allChecks = [
-        [resourceChecks, marker.resources],
-        [serviceChecks, marker.services],
-        [amenityChecks, marker.amenities],
-      ];
-
-      return allChecks.every(([checks, values]) =>
-        Object.entries(checks).every(([key, active]) =>
-          active ? values?.[key] : true
-        )
+      return Object.entries(categoryChecks).every(([key, active]) =>
+        active ? marker.categories?.[key] : true
       );
     };
 
@@ -173,11 +93,9 @@ function FilterPanel({
         : [];
     };
 
-    updatedFilters.push(
-      ...collectChecked(resourceChecks, "Resources"),
-      ...collectChecked(serviceChecks, "Services"),
-      ...collectChecked(amenityChecks, "Amenities")
-    );
+    currentSchema?.categories.forEach((category) => {
+      updatedFilters.push(...collectChecked(categoryChecks, category.categoryName));
+    });
 
     setSelectedFilters(updatedFilters);
   }, [
@@ -185,11 +103,17 @@ function FilterPanel({
     wheelchairOnly,
     dayFilter,
     timeFilter,
-    resourceChecks,
-    serviceChecks,
-    amenityChecks,
+    categoryChecks,
     setFilteredMarkers,
+    currentSchema,
   ]);
+
+  const handleCheckboxChange = (label, checked) => {
+    setCategoryChecks((prev) => ({
+      ...prev,
+      [label]: checked,
+    }));
+  };
 
   return (
     <div className="panel">
@@ -200,23 +124,40 @@ function FilterPanel({
       <div className="section">
         <h3>Global Settings</h3>
 
+        {/* Project Selector */}
+        <div className="form-group">
+          <label>Select Project:</label>
+          <select
+            value={currentSchema?.projectName || ""}
+            onChange={async (e) => {
+              const selectedProjectName = e.target.value;
+              const fetchedSchema = await fetchSchemaByProjectName(selectedProjectName);
+              setCurrentSchema(fetchedSchema);
+              setCurrentCollection(fetchedSchema.collectionName);
+              setSelectedLocation(null);
+            }}
+          >
+            {schemas.map((schema) => (
+              <option key={schema.projectName} value={schema.projectName}>
+                {schema.projectName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Tile Style Selector */}
         <div className="form-group">
           <label>Map Style:</label>
-          <select
-            value={tileStyle}
-            onChange={(e) => setTileStyle(e.target.value)}
-          >
+          <select value={tileStyle} onChange={(e) => setTileStyle(e.target.value)}>
             <option value="Standard">Standard</option>
             <option value="Terrain">Terrain</option>
           </select>
         </div>
 
+        {/* Day of Week Selector */}
         <div className="form-group">
           <label>Day of Week:</label>
-          <select
-            value={dayFilter}
-            onChange={(e) => setDayFilter(e.target.value)}
-          >
+          <select value={dayFilter} onChange={(e) => setDayFilter(e.target.value)}>
             <option value="Any">Any Day</option>
             {daysOfWeek.map((day) => (
               <option key={day} value={day}>
@@ -226,12 +167,10 @@ function FilterPanel({
           </select>
         </div>
 
+        {/* Time Selector */}
         <div className="form-group">
           <label>Time of Day:</label>
-          <select
-            value={timeFilter}
-            onChange={(e) => setTimeFilter(e.target.value)}
-          >
+          <select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)}>
             <option value="Any">Any Time</option>
             {timeOptionsAMPM.map((opt) => (
               <option key={opt} value={opt}>
@@ -241,6 +180,7 @@ function FilterPanel({
           </select>
         </div>
 
+        {/* Wheelchair Toggle */}
         <div className="inline-checkbox-row">
           <label className="label-container">♿ Wheelchair Accessible</label>
           <div className="checkbox-container">
@@ -253,23 +193,14 @@ function FilterPanel({
         </div>
       </div>
 
-      {renderCheckboxGroup(
-        "Resources",
-        resources,
-        resourceChecks,
-        handleResourceChange
-      )}
-      {renderCheckboxGroup(
-        "Services",
-        services,
-        serviceChecks,
-        handleServiceChange
-      )}
-      {renderCheckboxGroup(
-        "Amenities",
-        amenities,
-        amenityChecks,
-        handleAmenityChange
+      {/* Render Dynamic Categories */}
+      {currentSchema?.categories.map((category) =>
+        renderCheckboxGroupBySchema(
+          category.categoryName,
+          category.items,
+          categoryChecks,
+          handleCheckboxChange
+        )
       )}
     </div>
   );

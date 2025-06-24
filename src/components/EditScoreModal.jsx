@@ -1,7 +1,9 @@
+// src/components/EditScoreModal.jsx
+
 import React, { useState, useEffect } from "react";
 import "../styles/modals.css";
 import axios from "axios";
-import { getSafeLocationData } from "../data/dataModel.jsx";
+import { getSafeLocationData } from "../utils/locationHelpers.jsx";
 
 function EditScoreModal({
   isOpen,
@@ -9,33 +11,34 @@ function EditScoreModal({
   selectedLocation,
   setSelectedLocation,
   setMarkers,
+  currentSchema,
+  currentCollection,
 }) {
-  const [page, setPage] = useState(1);
-  const [locationData, setLocationData] = useState(getSafeLocationData());
+  const [page, setPage] = useState(1); // Page 1 is the selected location page
+  const [locationData, setLocationData] = useState(getSafeLocationData({}, currentSchema));
+
   const BASE_URL = import.meta.env.VITE_API_URL;
 
-  // Initialize locationData safely when modal opens
   useEffect(() => {
     if (selectedLocation) {
-      setLocationData(getSafeLocationData(selectedLocation));
+      setLocationData(getSafeLocationData(selectedLocation, currentSchema));
+      setPage(1);
     }
-  }, [selectedLocation]);
+  }, [selectedLocation, currentSchema]);
 
-  // Score editing handler
-  const handleScoreChange = (category, key, value) => {
+  const handleScoreChange = (categoryName, key, value) => {
     setLocationData((prev) => ({
       ...prev,
       scores: {
         ...prev.scores,
-        [category]: {
-          ...prev.scores[category],
+        [categoryName]: {
+          ...(prev.scores?.[categoryName] || {}),
           [key]: parseInt(value),
         },
       },
     }));
   };
 
-  // Handle submit and resync local state
   const handleSubmit = async () => {
     if (!selectedLocation || !locationData) {
       alert("No location selected.");
@@ -45,10 +48,13 @@ function EditScoreModal({
     try {
       await axios.put(
         `${BASE_URL}/api/locations/${selectedLocation._id}`,
-        locationData
+        locationData,
+        { params: { collectionName: currentCollection } }
       );
 
-      const res = await axios.get(`${BASE_URL}/api/locations`);
+      const res = await axios.get(`${BASE_URL}/api/locations`, {
+        params: { collectionName: currentCollection },
+      });
       setMarkers(res.data);
 
       const updated = res.data.find((loc) => loc._id === selectedLocation._id);
@@ -65,8 +71,8 @@ function EditScoreModal({
     }
   };
 
-  // Handle no selection fallback
   if (!isOpen) return null;
+
   if (!selectedLocation) {
     return (
       <div className="modal-overlay centered-modal-overlay">
@@ -80,6 +86,11 @@ function EditScoreModal({
       </div>
     );
   }
+
+  const totalPages = 1 + (currentSchema?.categories.length || 0);
+  const isCategoryPage = page > 1 && page <= totalPages;
+  const currentCategoryIndex = page - 2; // Page 2 is the first category
+  const currentCategory = currentSchema?.categories[currentCategoryIndex];
 
   return (
     <div className="modal-overlay centered-modal-overlay">
@@ -96,173 +107,61 @@ function EditScoreModal({
           </>
         )}
 
-        {page === 2 && (
+        {isCategoryPage && currentCategory && (
           <>
-            <h3>Resources</h3>
-            {Object.values(locationData.resources || {}).some((val) => val) ? (
+            <h3>{currentCategory.categoryName}</h3>
+            {Object.values(locationData.categories?.[currentCategory.categoryName] || {}).some((val) => val) ? (
               <table>
                 <thead>
                   <tr>
-                    <th>Resource</th>
+                    <th>Item</th>
                     <th>Rating</th>
                     <th>Stars</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(locationData.resources || {}).map(
-                    ([key, val]) =>
-                      val ? (
-                        <tr key={key}>
-                          <td>{key}</td>
-                          <td>
-                            <select
-                              value={locationData.scores.resources[key] || ""}
-                              onChange={(e) =>
-                                handleScoreChange(
-                                  "resources",
-                                  key,
-                                  e.target.value
-                                )
-                              }
-                            >
-                              <option value="">Select</option>
-                              {[1, 2, 3, 4, 5].map((n) => (
-                                <option key={n} value={n}>
-                                  {n}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                          <td>
-                            {"⭐".repeat(
-                              locationData.scores.resources[key] || 0
-                            )}
-                          </td>
-                        </tr>
-                      ) : null
+                  {currentCategory.items.map((item) =>
+                    locationData.categories?.[currentCategory.categoryName]?.[item.label] ? (
+                      <tr key={item.label}>
+                        <td>{item.label}</td>
+                        <td>
+                          <select
+                            value={locationData.scores?.[currentCategory.categoryName]?.[item.label] || ""}
+                            onChange={(e) =>
+                              handleScoreChange(
+                                currentCategory.categoryName,
+                                item.label,
+                                e.target.value
+                              )
+                            }
+                          >
+                            <option value="">Select</option>
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <option key={n} value={n}>
+                                {n}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td>
+                          {"⭐".repeat(
+                            locationData.scores?.[currentCategory.categoryName]?.[item.label] || 0
+                          )}
+                        </td>
+                      </tr>
+                    ) : null
                   )}
                 </tbody>
               </table>
             ) : (
-              <p className="empty-message">
-                No resources available at this location.
-              </p>
-            )}
-          </>
-        )}
-
-        {page === 3 && (
-          <>
-            <h3>Services</h3>
-            {Object.values(locationData.services || {}).some((val) => val) ? (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Service</th>
-                    <th>Rating</th>
-                    <th>Stars</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(locationData.services || {}).map(
-                    ([key, val]) =>
-                      val ? (
-                        <tr key={key}>
-                          <td>{key}</td>
-                          <td>
-                            <select
-                              value={locationData.scores.services[key] || ""}
-                              onChange={(e) =>
-                                handleScoreChange(
-                                  "services",
-                                  key,
-                                  e.target.value
-                                )
-                              }
-                            >
-                              <option value="">Select</option>
-                              {[1, 2, 3, 4, 5].map((n) => (
-                                <option key={n} value={n}>
-                                  {n}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                          <td>
-                            {"⭐".repeat(
-                              locationData.scores.services[key] || 0
-                            )}
-                          </td>
-                        </tr>
-                      ) : null
-                  )}
-                </tbody>
-              </table>
-            ) : (
-              <p className="empty-message">
-                No services available at this location.
-              </p>
-            )}
-          </>
-        )}
-        {page === 4 && (
-          <>
-            <h3>Amenities</h3>
-            {Object.values(locationData.amenities || {}).some((val) => val) ? (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Amenity</th>
-                    <th>Rating</th>
-                    <th>Stars</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(locationData.amenities || {}).map(
-                    ([key, val]) =>
-                      val ? (
-                        <tr key={key}>
-                          <td>{key}</td>
-                          <td>
-                            <select
-                              value={locationData.scores.amenities[key] || ""}
-                              onChange={(e) =>
-                                handleScoreChange(
-                                  "amenities",
-                                  key,
-                                  e.target.value
-                                )
-                              }
-                            >
-                              <option value="">Select</option>
-                              {[1, 2, 3, 4, 5].map((n) => (
-                                <option key={n} value={n}>
-                                  {n}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                          <td>
-                            {"⭐".repeat(
-                              locationData.scores.amenities[key] || 0
-                            )}
-                          </td>
-                        </tr>
-                      ) : null
-                  )}
-                </tbody>
-              </table>
-            ) : (
-              <p className="empty-message">
-                No amenities available at this location.
-              </p>
+              <p className="empty-message">No {currentCategory.categoryName.toLowerCase()} available at this location.</p>
             )}
           </>
         )}
 
         <div className="buttons-container">
           {page > 1 && <button onClick={() => setPage(page - 1)}>Back</button>}
-          {page < 4 ? (
+          {page < totalPages ? (
             <button onClick={() => setPage(page + 1)}>Next</button>
           ) : (
             <button onClick={handleSubmit}>Submit</button>
@@ -274,3 +173,4 @@ function EditScoreModal({
 }
 
 export default EditScoreModal;
+

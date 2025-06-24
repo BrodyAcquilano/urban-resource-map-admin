@@ -1,30 +1,43 @@
-import React, { useState } from "react";
+// src/components/AddLocationModal.jsx
+
+import React, { useState, useEffect } from "react";
 import "../styles/modals.css";
 import axios from "axios";
-import { renderCheckboxGroupWithNotes } from "../utils/renderingHelpers.jsx";
+import { renderCheckboxGroupWithNotesBySchema } from "../utils/renderingHelpers.jsx";
 
 import {
   daysOfWeek,
-  resources,
-  services,
-  amenities,
-  resourceNotes,
-  serviceNotes,
-  amenityNotes,
   timeOptionsAMPM,
   validateRequiredFields,
-  initialLocationData,
-} from "../data/dataModel.jsx";
+  initializeLocationData,
+} from "../utils/locationHelpers.jsx";
 
-function AddLocationModal({ isOpen, onClose, setMarkers }) {
+function AddLocationModal({
+  isOpen,
+  onClose,
+  setMarkers,
+  currentSchema,
+  currentCollection,
+}) {
   const [page, setPage] = useState(1);
-  const [formData, setFormData] = useState(initialLocationData);
+  const [formData, setFormData] = useState(
+    initializeLocationData(currentSchema)
+  );
+
+  // Reset form when modal opens or schema changes
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(initializeLocationData(currentSchema));
+      setPage(1);
+    }
+  }, [isOpen, currentSchema]);
 
   const resetForm = () => {
-    setFormData(initialLocationData);
+    setFormData(initializeLocationData(currentSchema));
   };
 
   const BASE_URL = import.meta.env.VITE_API_URL;
+
   const handleSubmit = async () => {
     const locationData = {
       ...formData,
@@ -40,7 +53,10 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
     }
 
     try {
-      const res = await axios.post(`${BASE_URL}/api/locations`, locationData);
+      const res = await axios.post(
+        `${BASE_URL}/api/locations?collectionName=${currentCollection}`,
+        locationData
+      );
       const newMarker = { _id: res.data.id, ...locationData };
       setMarkers((prev) => [...prev, newMarker]);
 
@@ -54,51 +70,20 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
     }
   };
 
-  const handleResourceChange = (label, checked) => {
+  const handleCheckboxChange = (categoryName, label, checked) => {
     setFormData((prev) => ({
       ...prev,
-      resources: {
-        ...prev.resources,
-        [label]: checked,
-      },
-      scores: {
-        ...prev.scores,
-        resources: {
-          ...prev.scores.resources,
-          [label]: checked ? 3 : 0,
+      categories: {
+        ...prev.categories,
+        [categoryName]: {
+          ...prev.categories[categoryName],
+          [label]: checked,
         },
       },
-    }));
-  };
-
-  const handleServiceChange = (label, checked) => {
-    setFormData((prev) => ({
-      ...prev,
-      services: {
-        ...prev.services,
-        [label]: checked,
-      },
       scores: {
         ...prev.scores,
-        services: {
-          ...prev.scores.services,
-          [label]: checked ? 3 : 0,
-        },
-      },
-    }));
-  };
-
-  const handleAmenityChange = (label, checked) => {
-    setFormData((prev) => ({
-      ...prev,
-      amenities: {
-        ...prev.amenities,
-        [label]: checked,
-      },
-      scores: {
-        ...prev.scores,
-        amenities: {
-          ...prev.scores.amenities,
+        [categoryName]: {
+          ...prev.scores[categoryName],
           [label]: checked ? 3 : 0,
         },
       },
@@ -106,6 +91,11 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
   };
 
   if (!isOpen) return null;
+
+  const totalPages = 1 + (currentSchema?.categories.length || 0);
+  const isCategoryPage = page > 1 && page <= totalPages;
+  const currentCategoryIndex = page - 2; // Page 2 is the first category
+  const currentCategory = currentSchema?.categories[currentCategoryIndex];
 
   return (
     <div className="modal-overlay centered-modal-overlay">
@@ -138,7 +128,7 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    latitude: e.target.value,
+                    latitude: parseFloat(e.target.value),
                   }))
                 }
                 placeholder="Required..."
@@ -153,7 +143,7 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    longitude: e.target.value,
+                    longitude: parseFloat(e.target.value),
                   }))
                 }
                 placeholder="Required..."
@@ -307,36 +297,19 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
             </table>
           </>
         )}
-        {page === 2 &&
-          renderCheckboxGroupWithNotes(
-            "Resources",
-            resources,
-            formData.resources,
-            handleResourceChange,
-            resourceNotes
-          )}
 
-        {page === 3 &&
-          renderCheckboxGroupWithNotes(
-            "Services",
-            services,
-            formData.services,
-            handleServiceChange,
-            serviceNotes
-          )}
-
-        {page === 4 &&
-          renderCheckboxGroupWithNotes(
-            "Amenities",
-            amenities,
-            formData.amenities,
-            handleAmenityChange,
-            amenityNotes
+        {/* Dynamic Category Rendering */}
+        {isCategoryPage &&
+          renderCheckboxGroupWithNotesBySchema(
+            currentCategory,
+            formData.categories[currentCategory.categoryName],
+            (label, checked) =>
+              handleCheckboxChange(currentCategory.categoryName, label, checked)
           )}
 
         <div className="buttons-container">
           {page > 1 && <button onClick={() => setPage(page - 1)}>Back</button>}
-          {page < 4 ? (
+          {page < totalPages ? (
             <button onClick={() => setPage(page + 1)}>Next</button>
           ) : (
             <button onClick={handleSubmit}>Submit</button>
@@ -348,3 +321,4 @@ function AddLocationModal({ isOpen, onClose, setMarkers }) {
 }
 
 export default AddLocationModal;
+

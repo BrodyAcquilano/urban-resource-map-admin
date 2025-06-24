@@ -5,7 +5,13 @@ import EditLocation from "../components/EditLocation.jsx";
 import AddLocationModal from "../components/AddLocationModal.jsx";
 import '../styles/pages.css';
 
-function Editor({ setMarkers, selectedLocation, setSelectedLocation }) {
+function Editor({
+  setMarkers,
+  selectedLocation,
+  setSelectedLocation,
+  currentSchema,
+  currentCollection,
+}) {
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [showEditLocation, setShowEditLocation] = useState(false);
 
@@ -13,22 +19,19 @@ function Editor({ setMarkers, selectedLocation, setSelectedLocation }) {
     <>
       {/* Editor Panel Toggle + Panel */}
       <button
-        className={`side-toggle toggle ${
-          showEditLocation ? "" : "collapsed-toggle"
-        }`}
+        className={`side-toggle toggle ${showEditLocation ? "" : "collapsed-toggle"}`}
         onClick={() => setShowEditLocation(!showEditLocation)}
       >
         ☰
       </button>
-      <div
-        className={`overlay-panel panel-wrapper ${
-          showEditLocation ? "" : "collapsed"
-        }`}
-      >
+
+      <div className={`overlay-panel panel-wrapper ${showEditLocation ? "" : "collapsed"}`}>
         <EditLocation
           setMarkers={setMarkers}
           selectedLocation={selectedLocation}
           setSelectedLocation={setSelectedLocation}
+          currentSchema={currentSchema}
+          currentCollection={currentCollection}
         />
       </div>
 
@@ -45,9 +48,13 @@ function Editor({ setMarkers, selectedLocation, setSelectedLocation }) {
         isOpen={isAddModalOpen}
         onClose={() => setAddModalOpen(false)}
         setMarkers={setMarkers}
+        currentSchema={currentSchema}
+        currentCollection={currentCollection}
       />
     </>
   );
 }
 
 export default Editor;
+
+
