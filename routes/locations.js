@@ -6,8 +6,19 @@ import { getMongoClient } from "../db.js";
 
 const router = express.Router();
 
+// Extract database name from Mongo URI
+function getDatabaseName(uri) {
+  try {
+    const url = new URL(uri);
+    const dbName = url.pathname.split("/")[1];
+    return dbName || "test"; // Fallback if no database is provided
+  } catch (err) {
+    console.error("Invalid Mongo URI format:", err);
+    return null;
+  }
+}
+
 // POST - Add Location
-// Example: POST /api/locations?collectionName=X&mongoURI=yourMongoURI
 router.post("/", async (req, res) => {
   const { mongoURI, collectionName } = req.query;
 
@@ -16,7 +27,13 @@ router.post("/", async (req, res) => {
   }
 
   const client = await getMongoClient(mongoURI);
-  const db = client.db();
+  const dbName = getDatabaseName(mongoURI);
+
+  if (!dbName) {
+    return res.status(400).json({ error: "Invalid MongoDB URI format (no database specified)." });
+  }
+
+  const db = client.db(dbName);
 
   const {
     name,
@@ -60,7 +77,6 @@ router.post("/", async (req, res) => {
 });
 
 // GET - Fetch All Locations
-// Example: GET /api/locations?collectionName=X&mongoURI=yourMongoURI
 router.get("/", async (req, res) => {
   const { mongoURI, collectionName } = req.query;
 
@@ -69,7 +85,13 @@ router.get("/", async (req, res) => {
   }
 
   const client = await getMongoClient(mongoURI);
-  const db = client.db();
+  const dbName = getDatabaseName(mongoURI);
+
+  if (!dbName) {
+    return res.status(400).json({ error: "Invalid MongoDB URI format (no database specified)." });
+  }
+
+  const db = client.db(dbName);
 
   try {
     const locations = await db.collection(collectionName).find().toArray();
@@ -81,7 +103,6 @@ router.get("/", async (req, res) => {
 });
 
 // PUT - Update Location
-// Example: PUT /api/locations/:id?collectionName=X&mongoURI=yourMongoURI
 router.put("/:id", async (req, res) => {
   const { mongoURI, collectionName } = req.query;
   const { id } = req.params;
@@ -91,7 +112,13 @@ router.put("/:id", async (req, res) => {
   }
 
   const client = await getMongoClient(mongoURI);
-  const db = client.db();
+  const dbName = getDatabaseName(mongoURI);
+
+  if (!dbName) {
+    return res.status(400).json({ error: "Invalid MongoDB URI format (no database specified)." });
+  }
+
+  const db = client.db(dbName);
 
   try {
     const updateResult = await db
@@ -106,7 +133,6 @@ router.put("/:id", async (req, res) => {
 });
 
 // DELETE - Remove Location
-// Example: DELETE /api/locations/:id?collectionName=X&mongoURI=yourMongoURI
 router.delete("/:id", async (req, res) => {
   const { mongoURI, collectionName } = req.query;
   const { id } = req.params;
@@ -116,7 +142,13 @@ router.delete("/:id", async (req, res) => {
   }
 
   const client = await getMongoClient(mongoURI);
-  const db = client.db();
+  const dbName = getDatabaseName(mongoURI);
+
+  if (!dbName) {
+    return res.status(400).json({ error: "Invalid MongoDB URI format (no database specified)." });
+  }
+
+  const db = client.db(dbName);
 
   try {
     const result = await db

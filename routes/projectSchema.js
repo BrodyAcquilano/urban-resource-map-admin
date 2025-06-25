@@ -5,8 +5,19 @@ import { getMongoClient } from "../db.js";
 
 const router = express.Router();
 
+// Extract database name from Mongo URI
+function getDatabaseName(uri) {
+  try {
+    const url = new URL(uri);
+    const dbName = url.pathname.split("/")[1];
+    return dbName || "test"; // Fallback if no database is provided
+  } catch (err) {
+    console.error("Invalid Mongo URI format:", err);
+    return null;
+  }
+}
+
 // GET all project schemas
-// Example: GET /api/projectSchema?mongoURI=yourMongoURI
 router.get("/", async (req, res) => {
   const { mongoURI } = req.query;
 
@@ -16,7 +27,13 @@ router.get("/", async (req, res) => {
 
   try {
     const client = await getMongoClient(mongoURI);
-    const db = client.db(); // Uses the DB from the connection string
+    const dbName = getDatabaseName(mongoURI);
+
+    if (!dbName) {
+      return res.status(400).json({ error: "Invalid MongoDB URI format (no database specified)." });
+    }
+
+    const db = client.db(dbName);
 
     const schemas = await db.collection("projectSchema").find().toArray();
     if (!schemas || schemas.length === 0) {
@@ -30,7 +47,6 @@ router.get("/", async (req, res) => {
 });
 
 // GET specific schema by projectName
-// Example: GET /api/projectSchema/project?projectName=X&mongoURI=yourMongoURI
 router.get("/project", async (req, res) => {
   const { mongoURI, projectName } = req.query;
 
@@ -40,7 +56,13 @@ router.get("/project", async (req, res) => {
 
   try {
     const client = await getMongoClient(mongoURI);
-    const db = client.db();
+    const dbName = getDatabaseName(mongoURI);
+
+    if (!dbName) {
+      return res.status(400).json({ error: "Invalid MongoDB URI format (no database specified)." });
+    }
+
+    const db = client.db(dbName);
 
     const schemaDoc = await db.collection("projectSchema").findOne({ projectName });
     if (!schemaDoc) {
@@ -54,3 +76,4 @@ router.get("/project", async (req, res) => {
 });
 
 export default router;
+
