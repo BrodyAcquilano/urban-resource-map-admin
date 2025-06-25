@@ -87,19 +87,18 @@ function FilterPanel({
       updatedFilters.push({ type: "accessibility", label: true });
     }
 
-    const collectChecked = (checks, categoryLabel) => {
-      const items = Object.entries(checks)
-        .filter(([_, checked]) => checked)
-        .map(([label]) => ({ type: "category-item", label }));
+    const collectChecked = (checks, category) => {
+  const items = category.items
+    .filter((item) => checks[item.label])
+    .map((item) => ({ type: "category-item", label: item.label }));
 
-      return items.length
-        ? [{ type: "category-header", label: categoryLabel }, ...items]
-        : [];
-    };
-
+  return items.length
+    ? [{ type: "category-header", label: category.categoryName }, ...items]
+    : [];
+};
     currentSchema?.categories.forEach((category) => {
-      updatedFilters.push(...collectChecked(categoryChecks, category.categoryName));
-    });
+  updatedFilters.push(...collectChecked(categoryChecks, category));
+});
 
     setSelectedFilters(updatedFilters);
   }, [
