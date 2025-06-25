@@ -10,8 +10,10 @@ function SettingsModal({
   const [inputValue, setInputValue] = useState(mongoURI || "");
 
   useEffect(() => {
-    setInputValue(mongoURI || "");
-  }, [mongoURI]);
+    if (isSettingsModalOpen) {
+      setInputValue(mongoURI || "");
+    }
+  }, [isSettingsModalOpen, mongoURI]);
 
   // If user clears the input, automatically reset to default
   useEffect(() => {
@@ -37,16 +39,16 @@ function SettingsModal({
         >
           ×
         </button>
-        <h2>Database Connection Settings</h2>
+        <h3>Database Connection Settings</h3>
 
         <div className="form-group">
           <label>MongoDB Connection String:</label>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="mongodb+srv://..."
-          />
+         <input
+  type="text"
+  value={inputValue}
+  onChange={(e) => setInputValue(e.target.value)}
+  placeholder="mongodb+srv://<username>:<password>@<cluster-address>/<database>?retryWrites=true&w=majority"
+/>
         </div>
 
         <div className="buttons-container">

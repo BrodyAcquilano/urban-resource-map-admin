@@ -3,7 +3,7 @@ import InfoPanel from "../components/InfoPanel.jsx";
 import SettingsModal from "../components/SettingsModal.jsx";
 import "../styles/pages.css";
 
-function Home({ setMongoURI, selectedLocation, currentSchema }) {
+function Home({ mongoURI, setMongoURI, selectedLocation, currentSchema }) {
   const [showInfo, setShowInfo] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   return (
@@ -33,6 +33,7 @@ function Home({ setMongoURI, selectedLocation, currentSchema }) {
         <SettingsModal
           isSettingsModalOpen={isSettingsModalOpen}
           setIsSettingsModalOpen={setIsSettingsModalOpen}
+          mongoURI={mongoURI}
           setMongoURI={setMongoURI}
         />
     </>
