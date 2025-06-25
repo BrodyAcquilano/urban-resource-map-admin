@@ -1,17 +1,24 @@
-// src/components/SettingsModal.jsx
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/modals.css";
 
 function SettingsModal({
   isSettingsModalOpen,
   setIsSettingsModalOpen,
+  mongoURI,
   setMongoURI,
 }) {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(mongoURI || "");
+
+  // If user clears the input, automatically reset to default
+  useEffect(() => {
+    if (inputValue.trim() === "") {
+      const defaultURI = import.meta.env.VITE_DEFAULT_MONGO_URI;
+      setMongoURI(defaultURI);
+    }
+  }, [inputValue, setMongoURI]);
 
   const handleSave = () => {
-    setMongoURI(inputValue);
+    setMongoURI(inputValue.trim());
     setIsSettingsModalOpen(false);
   };
 
@@ -20,12 +27,11 @@ function SettingsModal({
   return (
     <div className="modal-overlay centered-modal-overlay">
       <div className="modal">
-        
-       <button className="close-button" onClick={() => setIsSettingsModalOpen(false)}>
-  ×
-</button>
-
+        <button className="close-button" onClick={() => setIsSettingsModalOpen(false)}>
+          ×
+        </button>
         <h2>Database Connection Settings</h2>
+
         <div className="form-group">
           <label>MongoDB Connection String:</label>
           <input
@@ -35,9 +41,10 @@ function SettingsModal({
             placeholder="mongodb+srv://..."
           />
         </div>
+
         <div className="buttons-container">
           <button onClick={handleSave}>Save</button>
-          <button onClick={() => setIsSettingsModalOpen(false)}>Cancel</button>
+          <button onClick={() => setInputValue("")}>Clear</button>
         </div>
       </div>
     </div>

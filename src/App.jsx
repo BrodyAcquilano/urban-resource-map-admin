@@ -43,7 +43,7 @@ function App() {
   // 📊 Global State for Map + UI
   // ─────────────────────────────────────────────
 
-  const [mongoURI, setMongoURI]=useState("");
+const [mongoURI, setMongoURI] = useState(import.meta.env.VITE_DEFAULT_MONGO_URI);
   const [schemas, setSchemas] = useState([]);
   const [currentSchema, setCurrentSchema] = useState(null);
   const [currentCollection, setCurrentCollection] = useState("");
