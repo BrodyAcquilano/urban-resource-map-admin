@@ -1,9 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
-import connectToMongo from "./db.js";
+import { getMongoClient } from "./db.js";
 import schemaRoutes from "./routes/projectSchema.js";
 import locationRoutes from "./routes/locations.js";
-
 
 import cors from "cors";
 
@@ -17,9 +16,8 @@ app.use(express.json());
 app.use("/api/schema", schemaRoutes);
 app.use("/api/locations", locationRoutes);
 
-
 async function startServer() {
-  const db = await connectToMongo();
+  const db = await getMongoClient(process.env.MONGO_URI);
   app.locals.db = db;
 
   app.get("/", (req, res) => {
