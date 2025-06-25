@@ -7,22 +7,33 @@ function SettingsModal({
   mongoURI,
   setMongoURI,
 }) {
-  const [inputValue, setInputValue] = useState(mongoURI || "");
+  const [mongoURIInputString, setMongoURIInputString] = useState("");
 
   useEffect(() => {
     if (isSettingsModalOpen) {
-      setInputValue(mongoURI || "");
+      // Only show user input, never the default
+      if (mongoURI === import.meta.env.VITE_DEFAULT_MONGO_URI) {
+        setMongoURIInputString("");
+      } else {
+        setMongoURIInputString(mongoURI);
+      }
     }
   }, [isSettingsModalOpen, mongoURI]);
 
   const handleSave = () => {
-    setMongoURI(inputValue.trim());
+    if (mongoURIInputString.trim() === "") {
+      // User left input blank → fallback to default
+      setMongoURI(import.meta.env.VITE_DEFAULT_MONGO_URI);
+    } else {
+      // User provided a custom URI
+      setMongoURI(mongoURIInputString.trim());
+    }
     setIsSettingsModalOpen(false);
   };
 
   const handleClear = () => {
-    setInputValue("");
-    setMongoURI("");
+    setMongoURIInputString("");
+    // Do not update mongoURI yet → mongoURI will fallback to default only on save
   };
 
   if (!isSettingsModalOpen) return null;
@@ -42,8 +53,8 @@ function SettingsModal({
           <label>MongoDB Connection String:</label>
           <input
             type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            value={mongoURIInputString}
+            onChange={(e) => setMongoURIInputString(e.target.value)}
             placeholder="mongodb+srv://<username>:<password>@<cluster-address>/<database>?retryWrites=true&w=majority"
           />
         </div>
@@ -58,3 +69,4 @@ function SettingsModal({
 }
 
 export default SettingsModal;
+
