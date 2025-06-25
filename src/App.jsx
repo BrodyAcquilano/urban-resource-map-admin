@@ -60,20 +60,19 @@ const [mongoURI, setMongoURI] = useState(import.meta.env.VITE_DEFAULT_MONGO_URI)
   const BASE_URL = import.meta.env.VITE_API_URL;
 
   // 📡 Fetch all schemas and default markers on app load
-  useEffect(() => {
-    const loadSchemas = async () => {
-      const loadedSchemas = await fetchAllSchemas(mongoURI);
-      setSchemas(loadedSchemas);
+ useEffect(() => {
+  const loadSchemas = async () => {
+    const loadedSchemas = await fetchAllSchemas(mongoURI);
+    setSchemas(loadedSchemas);
 
-      if (loadedSchemas.length > 0) {
-        // Set first schema as default
-        setCurrentSchema(loadedSchemas[0]);
-        setCurrentCollection(loadedSchemas[0].collectionName);
-      }
-    };
+    if (loadedSchemas.length > 0) {
+      setCurrentSchema(loadedSchemas[0]);
+      setCurrentCollection(loadedSchemas[0].collectionName);
+    }
+  };
 
-    loadSchemas();
-  }, []);
+  loadSchemas();
+}, [mongoURI]);
 
   // 📡 Fetch markers when the current collection changes
   useEffect(() => {
