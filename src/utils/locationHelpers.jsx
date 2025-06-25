@@ -66,13 +66,21 @@ export function initializeLocationData(schema) {
   };
 }
 
-// Used to safely load existing location data into forms
 export function getSafeLocationData(raw = {}, schema) {
   const safeCategories = {};
+  const safeScores = {};
+
   schema.categories.forEach((category) => {
+    // Build default categories
     safeCategories[category.categoryName] = {
       ...Object.fromEntries(category.items.map((item) => [item.label, false])),
       ...(raw.categories?.[category.categoryName] || {}),
+    };
+
+    // Build default scores
+    safeScores[category.categoryName] = {
+      ...Object.fromEntries(category.items.map((item) => [item.label, 0])),
+      ...(raw.scores?.[category.categoryName] || {}),
     };
   });
 
@@ -87,9 +95,10 @@ export function getSafeLocationData(raw = {}, schema) {
     isLocationOpen: raw.isLocationOpen || { ...defaultIsLocationOpen },
     openHours: raw.openHours || { ...defaultOpenHours },
     categories: safeCategories,
-    scores: raw.scores || {},
+    scores: safeScores,
   };
 }
+
 
 // ────────────────
 // Utility Functions

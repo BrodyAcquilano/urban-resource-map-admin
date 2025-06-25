@@ -62,9 +62,12 @@ function FilterPanel({
         if (!matchesAny) return false;
       }
 
-      return Object.entries(categoryChecks).every(([key, active]) =>
-        active ? marker.categories?.[key] : true
-      );
+      return Object.entries(categoryChecks).every(([key, active]) => {
+  if (!active) return true;
+
+  // Search through all categories to see if this key is active anywhere
+  return Object.values(marker.categories || {}).some(categoryGroup => categoryGroup?.[key]);
+});
     };
 
     setFilteredMarkers(markers.filter(matchesFilter));
