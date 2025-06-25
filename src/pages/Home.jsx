@@ -22,8 +22,9 @@ function Home({ setMongoURI, selectedLocation, currentSchema }) {
           selectedLocation={selectedLocation}
           currentSchema={currentSchema}
         />
+      </div>
 
-        <button
+       <button
           className="modal-button"
           onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)}
         >
@@ -34,7 +35,6 @@ function Home({ setMongoURI, selectedLocation, currentSchema }) {
           setIsSettingsModalOpen={setIsSettingsModalOpen}
           setMongoURI={setMongoURI}
         />
-      </div>
     </>
   );
 }
