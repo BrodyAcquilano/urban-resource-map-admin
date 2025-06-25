@@ -15,17 +15,14 @@ function SettingsModal({
     }
   }, [isSettingsModalOpen, mongoURI]);
 
-  // If user clears the input, automatically reset to default
-  useEffect(() => {
-    if (inputValue.trim() === "") {
-      const defaultURI = import.meta.env.VITE_DEFAULT_MONGO_URI;
-      setMongoURI(defaultURI);
-    }
-  }, [inputValue, setMongoURI]);
-
   const handleSave = () => {
     setMongoURI(inputValue.trim());
     setIsSettingsModalOpen(false);
+  };
+
+  const handleClear = () => {
+    setInputValue("");
+    setMongoURI("");
   };
 
   if (!isSettingsModalOpen) return null;
@@ -43,17 +40,17 @@ function SettingsModal({
 
         <div className="form-group">
           <label>MongoDB Connection String:</label>
-         <input
-  type="text"
-  value={inputValue}
-  onChange={(e) => setInputValue(e.target.value)}
-  placeholder="mongodb+srv://<username>:<password>@<cluster-address>/<database>?retryWrites=true&w=majority"
-/>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="mongodb+srv://<username>:<password>@<cluster-address>/<database>?retryWrites=true&w=majority"
+          />
         </div>
 
         <div className="buttons-container">
           <button onClick={handleSave}>Save</button>
-          <button onClick={() => setInputValue("")}>Clear</button>
+          <button onClick={handleClear}>Clear</button>
         </div>
       </div>
     </div>
