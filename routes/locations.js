@@ -2,16 +2,21 @@
 
 import express from "express";
 import { ObjectId } from "mongodb";
+import { getMongoClient } from "../db.js";
+
 const router = express.Router();
 
 // POST - Add Location
+// Example: POST /api/locations?collectionName=X&mongoURI=yourMongoURI
 router.post("/", async (req, res) => {
-  const db = req.app.locals.db;
-  const collectionName = req.query.collectionName;
+  const { mongoURI, collectionName } = req.query;
 
-  if (!collectionName) {
-    return res.status(400).json({ error: "Missing collection name." });
+  if (!mongoURI || !collectionName) {
+    return res.status(400).json({ error: "Missing mongoURI or collection name." });
   }
+
+  const client = await getMongoClient(mongoURI);
+  const db = client.db();
 
   const {
     name,
@@ -55,13 +60,16 @@ router.post("/", async (req, res) => {
 });
 
 // GET - Fetch All Locations
+// Example: GET /api/locations?collectionName=X&mongoURI=yourMongoURI
 router.get("/", async (req, res) => {
-  const db = req.app.locals.db;
-  const collectionName = req.query.collectionName;
+  const { mongoURI, collectionName } = req.query;
 
-  if (!collectionName) {
-    return res.status(400).json({ error: "Missing collection name." });
+  if (!mongoURI || !collectionName) {
+    return res.status(400).json({ error: "Missing mongoURI or collection name." });
   }
+
+  const client = await getMongoClient(mongoURI);
+  const db = client.db();
 
   try {
     const locations = await db.collection(collectionName).find().toArray();
@@ -73,14 +81,17 @@ router.get("/", async (req, res) => {
 });
 
 // PUT - Update Location
+// Example: PUT /api/locations/:id?collectionName=X&mongoURI=yourMongoURI
 router.put("/:id", async (req, res) => {
-  const db = req.app.locals.db;
+  const { mongoURI, collectionName } = req.query;
   const { id } = req.params;
-  const collectionName = req.query.collectionName;
 
-  if (!collectionName) {
-    return res.status(400).json({ error: "Missing collection name." });
+  if (!mongoURI || !collectionName) {
+    return res.status(400).json({ error: "Missing mongoURI or collection name." });
   }
+
+  const client = await getMongoClient(mongoURI);
+  const db = client.db();
 
   try {
     const updateResult = await db
@@ -95,14 +106,17 @@ router.put("/:id", async (req, res) => {
 });
 
 // DELETE - Remove Location
+// Example: DELETE /api/locations/:id?collectionName=X&mongoURI=yourMongoURI
 router.delete("/:id", async (req, res) => {
-  const db = req.app.locals.db;
+  const { mongoURI, collectionName } = req.query;
   const { id } = req.params;
-  const collectionName = req.query.collectionName;
 
-  if (!collectionName) {
-    return res.status(400).json({ error: "Missing collection name." });
+  if (!mongoURI || !collectionName) {
+    return res.status(400).json({ error: "Missing mongoURI or collection name." });
   }
+
+  const client = await getMongoClient(mongoURI);
+  const db = client.db();
 
   try {
     const result = await db
@@ -121,3 +135,4 @@ router.delete("/:id", async (req, res) => {
 });
 
 export default router;
+

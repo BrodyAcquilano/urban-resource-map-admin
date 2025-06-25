@@ -13,6 +13,7 @@ import {
 } from "../utils/locationHelpers.jsx";
 
 function AddLocationModal({
+   mongoURI,
   isOpen,
   onClose,
   setMarkers,
@@ -53,10 +54,10 @@ function AddLocationModal({
     }
 
     try {
-      const res = await axios.post(
-        `${BASE_URL}/api/locations?collectionName=${currentCollection}`,
-        locationData
-      );
+     const res = await axios.post(
+  `${BASE_URL}/api/locations?collectionName=${currentCollection}&mongoURI=${mongoURI}`,
+  locationData
+);
       const newMarker = { _id: res.data.id, ...locationData };
       setMarkers((prev) => [...prev, newMarker]);
 

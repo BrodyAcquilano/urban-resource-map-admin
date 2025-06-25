@@ -12,6 +12,7 @@ import {
 import { renderCheckboxGroupBySchema } from "../utils/renderingHelpers.jsx";
 
 function EditLocation({
+  mongoURI,
   setMarkers,
   selectedLocation,
   setSelectedLocation,
@@ -37,15 +38,15 @@ function EditLocation({
     }
 
     try {
-      await axios.put(
-        `${BASE_URL}/api/locations/${selectedLocation._id}`,
-        formData,
-        { params: { collectionName: currentCollection } }
-      );
+     await axios.put(
+  `${BASE_URL}/api/locations/${selectedLocation._id}`,
+  formData,
+  { params: { collectionName: currentCollection, mongoURI: mongoURI } }
+);
 
-      const response = await axios.get(`${BASE_URL}/api/locations`, {
-        params: { collectionName: currentCollection },
-      });
+    const response = await axios.get(`${BASE_URL}/api/locations`, {
+  params: { collectionName: currentCollection, mongoURI: mongoURI },
+});
       setMarkers(response.data);
 
       const updated = response.data.find((loc) => loc._id === selectedLocation._id);
@@ -64,13 +65,13 @@ function EditLocation({
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`${BASE_URL}/api/locations/${selectedLocation._id}`, {
-        params: { collectionName: currentCollection },
-      });
+ await axios.delete(`${BASE_URL}/api/locations/${selectedLocation._id}`, {
+  params: { collectionName: currentCollection, mongoURI: mongoURI },
+});
 
       const response = await axios.get(`${BASE_URL}/api/locations`, {
-        params: { collectionName: currentCollection },
-      });
+  params: { collectionName: currentCollection, mongoURI: mongoURI },
+});
       setMarkers(response.data);
       setSelectedLocation(null);
       alert("Location deleted.");

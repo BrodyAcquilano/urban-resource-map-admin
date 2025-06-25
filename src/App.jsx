@@ -43,6 +43,7 @@ function App() {
   // 📊 Global State for Map + UI
   // ─────────────────────────────────────────────
 
+  const [mongoURI, setMongoURI]=useState("");
   const [schemas, setSchemas] = useState([]);
   const [currentSchema, setCurrentSchema] = useState(null);
   const [currentCollection, setCurrentCollection] = useState("");
@@ -61,7 +62,7 @@ function App() {
   // 📡 Fetch all schemas and default markers on app load
   useEffect(() => {
     const loadSchemas = async () => {
-      const loadedSchemas = await fetchAllSchemas();
+      const loadedSchemas = await fetchAllSchemas(mongoURI);
       setSchemas(loadedSchemas);
 
       if (loadedSchemas.length > 0) {
@@ -78,18 +79,21 @@ function App() {
   useEffect(() => {
     if (!currentCollection) return;
 
-    const fetchMarkers = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/locations`, {
-          params: { collectionName: currentCollection },
-        });
-        setMarkers(res.data);
-      } catch (err) {
-        console.error("Failed to fetch markers:", err);
-      }
-    };
+   const fetchMarkers = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/api/locations`, {
+      params: { 
+        collectionName: currentCollection,
+        mongoURI 
+      },
+    });
+    setMarkers(res.data);
+  } catch (err) {
+    console.error("Failed to fetch markers:", err);
+  }
+};
 
-    fetchMarkers();
+fetchMarkers();
   }, [currentCollection]);
 
   // ─────────────────────────────────────────────
@@ -132,6 +136,7 @@ function App() {
       {/* Filter Panel */}
       <div className={`filter-overlay-panel filter-panel-wrapper ${showFilter ? "" : "collapsed"}`}>
         <FilterPanel
+           mongoURI={mongoURI}
           schemas={schemas} 
           currentSchema={currentSchema} 
           setCurrentSchema={setCurrentSchema} 
@@ -158,11 +163,12 @@ function App() {
 
       {/* Page Routing */}
       <Routes>
-        <Route path="/" element={<Home selectedLocation={selectedLocation} currentSchema={currentSchema} />} />
+        <Route path="/" element={<Home mongoURI={mongoURI} setMongoURI={setMongoURI} selectedLocation={selectedLocation} currentSchema={currentSchema} />} />
         <Route
           path="/editor"
           element={
             <Editor
+              mongoURI={mongoURI}
               setMarkers={setMarkers}
               selectedLocation={selectedLocation}
               setSelectedLocation={setSelectedLocation}
@@ -185,6 +191,7 @@ function App() {
           path="/analysis"
           element={
             <Analysis
+             mongoURI={mongoURI}
               markers={markers}
               setMarkers={setMarkers}
               selectedLocation={selectedLocation}

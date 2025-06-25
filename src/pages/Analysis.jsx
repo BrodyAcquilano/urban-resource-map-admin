@@ -4,6 +4,7 @@ import EditScoreModal from "../components/EditScoreModal.jsx";
 import '../styles/pages.css';
 
 function Analysis({
+   mongoURI,
   markers,
   setMarkers,
   selectedLocation,
@@ -44,6 +45,7 @@ function Analysis({
 
       {/* Modal */}
       <EditScoreModal
+       mongoURI={mongoURI}
         isOpen={isEditScoreModalOpen}
         onClose={() => setIsEditScoreModalOpen(false)}
         selectedLocation={selectedLocation}

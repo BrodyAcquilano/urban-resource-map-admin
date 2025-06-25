@@ -6,6 +6,7 @@ import AddLocationModal from "../components/AddLocationModal.jsx";
 import '../styles/pages.css';
 
 function Editor({
+   mongoURI,
   setMarkers,
   selectedLocation,
   setSelectedLocation,
@@ -27,6 +28,7 @@ function Editor({
 
       <div className={`overlay-panel panel-wrapper ${showEditLocation ? "" : "collapsed"}`}>
         <EditLocation
+         mongoURI={mongoURI}
           setMarkers={setMarkers}
           selectedLocation={selectedLocation}
           setSelectedLocation={setSelectedLocation}
@@ -45,6 +47,7 @@ function Editor({
 
       {/* Modal */}
       <AddLocationModal
+       mongoURI={mongoURI}
         isOpen={isAddModalOpen}
         onClose={() => setAddModalOpen(false)}
         setMarkers={setMarkers}

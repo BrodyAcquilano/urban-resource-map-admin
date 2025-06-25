@@ -1,20 +1,30 @@
-// db.js
+// src/db.js
+
 import { MongoClient } from "mongodb";
-import dotenv from "dotenv";
-dotenv.config();
 
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+// In-memory cache to store clients by URI
+const mongoClientCache = {};
 
-async function connectToMongo() {
+// Optional: Default URI (your current community database)
+const DEFAULT_URI = process.env.MONGO_URI;
+
+export async function getMongoClient(uri) {
+  // Fallback to default URI if empty
+  const connectionURI = uri || DEFAULT_URI;
+
+  if (mongoClientCache[connectionURI]) {
+    return mongoClientCache[connectionURI];
+  }
+
+  const client = new MongoClient(connectionURI);
+
   try {
     await client.connect();
-    console.log("✅ Connected to MongoDB Atlas");
-    return client.db("urban_resource_map");
+    console.log(`✅ New MongoDB Client connected for URI: ${connectionURI}`);
+    mongoClientCache[connectionURI] = client;
+    return client;
   } catch (err) {
-    console.error("❌ MongoDB connection failed:", err);
-    process.exit(1);
+    console.error("❌ Failed to connect to MongoDB:", err);
+    throw err;
   }
 }
-
-export default connectToMongo;

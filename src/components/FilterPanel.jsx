@@ -6,6 +6,7 @@ import { renderCheckboxGroupBySchema } from "../utils/renderingHelpers.jsx";
 import { fetchSchemaByProjectName } from "../utils/schemaFetcher.js";
 
 function FilterPanel({
+   mongoURI,
   schemas,
   currentSchema,
   setCurrentSchema,
@@ -131,7 +132,7 @@ function FilterPanel({
             value={currentSchema?.projectName || ""}
             onChange={async (e) => {
               const selectedProjectName = e.target.value;
-              const fetchedSchema = await fetchSchemaByProjectName(selectedProjectName);
+              const fetchedSchema = await fetchSchemaByProjectName( mongoURI, selectedProjectName);
               setCurrentSchema(fetchedSchema);
               setCurrentCollection(fetchedSchema.collectionName);
               setSelectedLocation(null);

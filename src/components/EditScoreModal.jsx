@@ -6,6 +6,7 @@ import axios from "axios";
 import { getSafeLocationData } from "../utils/locationHelpers.jsx";
 
 function EditScoreModal({
+  mongoURI,
   isOpen,
   onClose,
   selectedLocation,
@@ -46,15 +47,15 @@ function EditScoreModal({
     }
 
     try {
-      await axios.put(
-        `${BASE_URL}/api/locations/${selectedLocation._id}`,
-        locationData,
-        { params: { collectionName: currentCollection } }
-      );
+    await axios.put(
+  `${BASE_URL}/api/locations/${selectedLocation._id}`,
+  locationData,
+  { params: { collectionName: currentCollection, mongoURI: mongoURI } }
+);
 
-      const res = await axios.get(`${BASE_URL}/api/locations`, {
-        params: { collectionName: currentCollection },
-      });
+const res = await axios.get(`${BASE_URL}/api/locations`, {
+  params: { collectionName: currentCollection, mongoURI: mongoURI },
+});
       setMarkers(res.data);
 
       const updated = res.data.find((loc) => loc._id === selectedLocation._id);
