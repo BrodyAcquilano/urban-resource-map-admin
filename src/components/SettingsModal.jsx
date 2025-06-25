@@ -9,6 +9,10 @@ function SettingsModal({
 }) {
   const [inputValue, setInputValue] = useState(mongoURI || "");
 
+  useEffect(() => {
+    setInputValue(mongoURI || "");
+  }, [mongoURI]);
+
   // If user clears the input, automatically reset to default
   useEffect(() => {
     if (inputValue.trim() === "") {
@@ -27,7 +31,10 @@ function SettingsModal({
   return (
     <div className="modal-overlay centered-modal-overlay">
       <div className="modal">
-        <button className="close-button" onClick={() => setIsSettingsModalOpen(false)}>
+        <button
+          className="close-button"
+          onClick={() => setIsSettingsModalOpen(false)}
+        >
           ×
         </button>
         <h2>Database Connection Settings</h2>
